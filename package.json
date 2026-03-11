@@ -28,7 +28,7 @@
   },
   "overrides": {
     "node-domexception": "1.0.0",
-    "node-fetch": "^3.3.2"
+    "node-fetch": "^2.7.3"
   },
   "devDependencies": {
     "@types/express": "^4.17.21",
