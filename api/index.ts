@@ -1,6 +1,10 @@
-import { createServer } from "../server.ts";
+import { createServer } from "../server";
+
+let app: any;
 
 export default async (req: any, res: any) => {
-  const app = await createServer();
+  if (!app) {
+    app = await createServer();
+  }
   return app(req, res);
 };

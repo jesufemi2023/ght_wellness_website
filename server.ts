@@ -1,12 +1,10 @@
 import express from "express";
-import { createServer as createViteServer } from "vite";
 import path from "path";
 import { fileURLToPath } from "url";
-import { v4 as uuidv4 } from "uuid";
-import { getSupabaseAdmin } from "./src/services/supabaseAdmin.ts";
+import { getSupabaseAdmin } from "./src/services/supabaseAdmin";
 import { GoogleGenAI } from "@google/genai";
-import { NotificationService } from "./src/services/notificationService.ts";
-import { aiService } from "./src/services/ai/AIService.ts";
+import { NotificationService } from "./src/services/notificationService";
+import { aiService } from "./src/services/ai/AIService";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -726,17 +724,19 @@ export async function createServer() {
   });
 
   if (process.env.NODE_ENV !== "production" && !process.env.VERCEL) {
+    const { createServer: createViteServer } = await import("vite");
     const vite = await createViteServer({ server: { middlewareMode: true }, appType: "spa" });
     app.use(vite.middlewares);
   } else {
-    app.use(express.static(path.join(__dirname, "dist")));
+    app.use(express.static(path.join(process.cwd(), "dist")));
   }
 
   return app;
 }
 
 // Only start the server if this file is run directly
-if (fileURLToPath(import.meta.url) === process.argv[1]) {
+const isMainModule = fileURLToPath(import.meta.url) === process.argv[1];
+if (isMainModule && !process.env.VERCEL) {
   createServer().then(app => {
     app.listen(3000, "0.0.0.0", () => console.log("Server running on http://localhost:3000"));
   });
