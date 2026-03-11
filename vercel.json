@@ -11,10 +11,7 @@
       "destination": "/api/index.ts"
     },
     {
-      "handle": "filesystem"
-    },
-    {
-      "source": "/(.*)",
+      "source": "/((?!api|images|assets|favicon.ico).*)",
       "destination": "/index.html"
     }
   ]
