@@ -10,7 +10,7 @@ import { aiService } from "./src/services/ai/AIService.ts";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
-async function startServer() {
+export async function createServer() {
   const app = express();
   app.use(express.json({ limit: '10mb' }));
 
@@ -692,14 +692,19 @@ async function startServer() {
     res.json(order);
   });
 
-  if (process.env.NODE_ENV !== "production") {
+  if (process.env.NODE_ENV !== "production" && !process.env.VERCEL) {
     const vite = await createViteServer({ server: { middlewareMode: true }, appType: "spa" });
     app.use(vite.middlewares);
   } else {
     app.use(express.static(path.join(__dirname, "dist")));
   }
 
-  app.listen(3000, "0.0.0.0", () => console.log("Server running on http://localhost:3000"));
+  return app;
 }
 
-startServer();
+// Only start the server if this file is run directly
+if (fileURLToPath(import.meta.url) === process.argv[1]) {
+  createServer().then(app => {
+    app.listen(3000, "0.0.0.0", () => console.log("Server running on http://localhost:3000"));
+  });
+}
