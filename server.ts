@@ -1,9 +1,9 @@
 import express from "express";
 import path from "path";
 import { fileURLToPath } from "url";
-import { getSupabaseAdmin } from "./src/services/supabaseAdmin";
-import { NotificationService } from "./src/services/notificationService";
-import { getAIService } from "./src/services/ai/AIService";
+import { getSupabaseAdmin } from "./src/services/supabaseAdmin.js";
+import { NotificationService } from "./src/services/notificationService.js";
+import { getAIService } from "./src/services/ai/AIService.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 

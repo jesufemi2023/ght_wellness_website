@@ -1,6 +1,6 @@
 import { GoogleGenAI, HarmCategory, HarmBlockThreshold } from "@google/genai";
-import { AIKeyManager } from "./AIKeyManager";
-import { AICache } from "./AICache";
+import { AIKeyManager } from "./AIKeyManager.js";
+import { AICache } from "./AICache.js";
 
 export class AIService {
   private keyManager: AIKeyManager;
