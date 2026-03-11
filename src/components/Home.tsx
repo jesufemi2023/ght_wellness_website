@@ -25,6 +25,16 @@ import { ProductCard } from './ProductCard';
 import { PackageCard } from './PackageCard';
 import { ComboCard } from './ComboCard';
 
+// Import hero images
+import hero1 from '../assets/hero1.jpg';
+import hero2 from '../assets/hero2.jpg';
+import hero3 from '../assets/hero3.jpg';
+import hero4 from '../assets/hero4.jpg';
+import hero5 from '../assets/hero5.jpg';
+import hero6 from '../assets/hero6.jpg';
+import hero7 from '../assets/hero7.jpg';
+import hero8 from '../assets/hero8.jpg';
+
 interface HomeProps {
   products: Product[];
   comboPackages: PackageData[];
@@ -117,14 +127,14 @@ export function Home({
   const bestSellers = products.slice(0, 4);
 
   const heroImages = [
-    "/images/hero1.jpg",
-    "/images/hero2.jpg",
-    "/images/hero3.jpg",
-    "/images/hero4.jpg",
-    "/images/hero5.jpg",
-    "/images/hero6.jpg",
-    "/images/hero7.jpg",
-    "/images/hero8.jpg"
+    hero1,
+    hero2,
+    hero3,
+    hero4,
+    hero5,
+    hero6,
+    hero7,
+    hero8
   ];
 
   const [currentHeroIndex, setCurrentHeroIndex] = useState(0);
