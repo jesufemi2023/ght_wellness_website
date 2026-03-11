@@ -25,25 +25,16 @@ import { ProductCard } from './ProductCard';
 import { PackageCard } from './PackageCard';
 import { ComboCard } from './ComboCard';
 
-// Import hero images
-import hero1 from '../assets/hero1.jpg';
-import hero2 from '../assets/hero2.jpg';
-import hero3 from '../assets/hero3.jpg';
-import hero4 from '../assets/hero4.jpg';
-import hero5 from '../assets/hero5.jpg';
-import hero6 from '../assets/hero6.jpg';
-import hero7 from '../assets/hero7.jpg';
-import hero8 from '../assets/hero8.jpg';
-
+// Hero images are served from the public folder
 const HERO_IMAGES = [
-  hero1,
-  hero2,
-  hero3,
-  hero4,
-  hero5,
-  hero6,
-  hero7,
-  hero8
+  '/hero1.jpg',
+  '/hero2.jpg',
+  '/hero3.jpg',
+  '/hero4.jpg',
+  '/hero5.jpg',
+  '/hero6.jpg',
+  '/hero7.jpg',
+  '/hero8.jpg'
 ];
 
 interface HomeProps {
@@ -155,22 +146,13 @@ export function Home({
           <AnimatePresence mode="wait">
             <motion.div
               key={currentHeroIndex}
-              className="absolute inset-0 flex items-center justify-center"
+              className="absolute inset-0 bg-center bg-cover bg-no-repeat"
+              style={{ backgroundImage: `url(${HERO_IMAGES[currentHeroIndex]})` }}
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 1.2, ease: "easeInOut" }}
             >
-              <img 
-                src={HERO_IMAGES[currentHeroIndex]} 
-                alt={`Hero image ${currentHeroIndex + 1}`} 
-                className="w-full h-full object-cover"
-                referrerPolicy="no-referrer"
-                loading="eager"
-                onError={(e) => {
-                  (e.target as HTMLImageElement).src = `https://picsum.photos/seed/herowellness${currentHeroIndex}/1920/1080`;
-                }}
-              />
               {/* Subtle Overlay for readability only if needed */}
               <div className="absolute inset-0 bg-black/20"></div>
             </motion.div>
