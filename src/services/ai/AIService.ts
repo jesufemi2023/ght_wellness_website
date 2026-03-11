@@ -178,5 +178,11 @@ export class AIService {
   }
 }
 
-// Export a singleton instance
-export const aiService = new AIService();
+// Export a lazy getter for the singleton instance
+let _aiService: AIService | null = null;
+export const getAIService = () => {
+  if (!_aiService) {
+    _aiService = new AIService();
+  }
+  return _aiService;
+};

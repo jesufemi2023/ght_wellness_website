@@ -2,9 +2,8 @@ import express from "express";
 import path from "path";
 import { fileURLToPath } from "url";
 import { getSupabaseAdmin } from "./src/services/supabaseAdmin";
-import { GoogleGenAI } from "@google/genai";
 import { NotificationService } from "./src/services/notificationService";
-import { aiService } from "./src/services/ai/AIService";
+import { getAIService } from "./src/services/ai/AIService";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -16,7 +15,9 @@ export async function createServer() {
   let supabase: any;
   try {
     supabase = getSupabaseAdmin();
-    console.log("Supabase Admin Initialized Successfully");
+    if (supabase) {
+      console.log("Supabase Admin Initialized Successfully");
+    }
   } catch (e) {
     console.error("Supabase Initialization Error:", e);
   }
@@ -412,7 +413,7 @@ export async function createServer() {
       if (!message) return res.status(400).json({ error: "Message is required" });
 
       const productContext = await getProductContext();
-      const reply = await aiService.generateResponse(message, productContext);
+      const reply = await getAIService().generateResponse(message, productContext);
 
       res.json({ reply });
     } catch (error: any) {
@@ -531,7 +532,7 @@ export async function createServer() {
         }
       `;
 
-      const response = await aiService.generateResponse(prompt, productContext, "gemini-3-flash-preview", "application/json");
+      const response = await getAIService().generateResponse(prompt, productContext, "gemini-3-flash-preview", "application/json");
       try {
         const jsonStr = response.replace(/```json\n?|\n?```/g, '').trim();
         const result = JSON.parse(jsonStr);
