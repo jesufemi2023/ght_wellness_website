@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { motion } from 'motion/react';
+import { motion, AnimatePresence } from 'motion/react';
 import { 
   ArrowRight, 
   ShieldCheck, 
@@ -34,6 +34,17 @@ import hero5 from '../assets/hero5.jpg';
 import hero6 from '../assets/hero6.jpg';
 import hero7 from '../assets/hero7.jpg';
 import hero8 from '../assets/hero8.jpg';
+
+const HERO_IMAGES = [
+  hero1,
+  hero2,
+  hero3,
+  hero4,
+  hero5,
+  hero6,
+  hero7,
+  hero8
+];
 
 interface HomeProps {
   products: Product[];
@@ -126,57 +137,44 @@ export function Home({
   // Get top 4 products for bestsellers
   const bestSellers = products.slice(0, 4);
 
-  const heroImages = [
-    hero1,
-    hero2,
-    hero3,
-    hero4,
-    hero5,
-    hero6,
-    hero7,
-    hero8
-  ];
-
   const [currentHeroIndex, setCurrentHeroIndex] = useState(0);
 
   useEffect(() => {
     const timer = setInterval(() => {
-      setCurrentHeroIndex((prev) => (prev + 1) % heroImages.length);
+      setCurrentHeroIndex((prev) => (prev + 1) % HERO_IMAGES.length);
     }, 5000); // Change image every 5 seconds
     return () => clearInterval(timer);
-  }, [heroImages.length]);
+  }, []);
 
   return (
     <div className="space-y-12 md:space-y-16 pb-12">
       
       {/* 1. Hero Section - Full Screen Display */}
-      <section className="relative h-[calc(100vh-4rem)] md:h-[calc(100vh-5rem)] w-full overflow-hidden bg-black group">
+      <section className="relative h-[calc(100vh-4rem)] md:h-[calc(100vh-5rem)] w-full overflow-hidden bg-slate-900 group">
         <div className="absolute inset-0">
-          {heroImages.map((img, index) => (
+          <AnimatePresence mode="wait">
             <motion.div
-              key={index}
+              key={currentHeroIndex}
               className="absolute inset-0 flex items-center justify-center"
               initial={{ opacity: 0 }}
-              animate={{ 
-                opacity: index === currentHeroIndex ? 1 : 0,
-              }}
-              transition={{ 
-                opacity: { duration: 1.2, ease: "easeInOut" }
-              }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 1.2, ease: "easeInOut" }}
             >
               <img 
-                src={img} 
-                alt={`Hero image ${index + 1}`} 
+                src={HERO_IMAGES[currentHeroIndex]} 
+                alt={`Hero image ${currentHeroIndex + 1}`} 
                 className="w-full h-full object-cover"
                 referrerPolicy="no-referrer"
+                loading="eager"
                 onError={(e) => {
-                  (e.target as HTMLImageElement).src = `https://picsum.photos/seed/herowellness${index}/1920/1080`;
+                  (e.target as HTMLImageElement).src = `https://picsum.photos/seed/herowellness${currentHeroIndex}/1920/1080`;
                 }}
               />
               {/* Subtle Overlay for readability only if needed */}
               <div className="absolute inset-0 bg-black/20"></div>
             </motion.div>
-          ))}
+          </AnimatePresence>
         </div>
         
         <div className="relative z-10 h-full flex flex-col items-end justify-end p-10 pointer-events-none">
@@ -197,7 +195,7 @@ export function Home({
 
         {/* Carousel Indicators */}
         <div className="absolute bottom-10 left-0 right-0 flex justify-center gap-4 z-20">
-          {heroImages.map((_, index) => (
+          {HERO_IMAGES.map((_, index) => (
             <button
               key={index}
               onClick={() => setCurrentHeroIndex(index)}
@@ -212,13 +210,13 @@ export function Home({
         {/* Carousel Controls */}
         <div className="hidden md:block">
           <button 
-            onClick={() => setCurrentHeroIndex((prev) => (prev - 1 + heroImages.length) % heroImages.length)}
+            onClick={() => setCurrentHeroIndex((prev) => (prev - 1 + HERO_IMAGES.length) % HERO_IMAGES.length)}
             className="absolute left-8 top-1/2 -translate-y-1/2 w-16 h-16 rounded-full bg-white/10 text-white flex items-center justify-center backdrop-blur-md border border-white/20 opacity-0 group-hover:opacity-100 transition-all hover:bg-white hover:text-slate-900 z-20"
           >
             <ChevronLeft size={32} />
           </button>
           <button 
-            onClick={() => setCurrentHeroIndex((prev) => (prev + 1) % heroImages.length)}
+            onClick={() => setCurrentHeroIndex((prev) => (prev + 1) % HERO_IMAGES.length)}
             className="absolute right-8 top-1/2 -translate-y-1/2 w-16 h-16 rounded-full bg-white/10 text-white flex items-center justify-center backdrop-blur-md border border-white/20 opacity-0 group-hover:opacity-100 transition-all hover:bg-white hover:text-slate-900 z-20"
           >
             <ChevronRight size={32} />
