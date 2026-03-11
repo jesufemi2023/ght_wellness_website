@@ -18,6 +18,7 @@ export async function createServer() {
   let supabase: any;
   try {
     supabase = getSupabaseAdmin();
+    console.log("Supabase Admin Initialized Successfully");
   } catch (e) {
     console.error("Supabase Initialization Error:", e);
   }
@@ -100,6 +101,38 @@ export async function createServer() {
       res.status(401).json({ error: "Unauthorized Admin Access" });
     }
   };
+
+  // --- Health Check ---
+  app.get("/api/health", async (req, res) => {
+    const status: any = {
+      status: "ok",
+      supabase: !!supabase,
+      env: {
+        NODE_ENV: process.env.NODE_ENV,
+        VERCEL: !!process.env.VERCEL,
+        VITE_SUPABASE_URL: !!process.env.VITE_SUPABASE_URL,
+        SUPABASE_URL: !!process.env.SUPABASE_URL,
+        SUPABASE_SERVICE_ROLE_KEY: !!process.env.SUPABASE_SERVICE_ROLE_KEY,
+        SERVICE_ROLE_KEY: !!process.env.SERVICE_ROLE_KEY,
+      }
+    };
+
+    if (supabase) {
+      try {
+        const { count, error } = await supabase.from('products').select('*', { count: 'exact', head: true });
+        if (error) {
+          status.supabase_error = error.message;
+        } else {
+          status.supabase_connected = true;
+          status.product_count = count || 0;
+        }
+      } catch (e: any) {
+        status.supabase_error = e.message;
+      }
+    }
+
+    res.json(status);
+  });
 
   // --- Admin CRUD Routes ---
 
