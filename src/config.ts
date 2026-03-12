@@ -24,22 +24,35 @@ export const CONFIG = {
   },
   heroImages: (() => {
     const images: string[] = [];
-    const csvImages = import.meta.env.VITE_HERO_IMAGES;
     
+    // 1. Check for the comma-separated list (Most reliable for Vercel)
+    const csvImages = import.meta.env.VITE_HERO_IMAGES;
     if (csvImages) {
       return csvImages.split(',').map((s: string) => s.trim()).filter((s: string) => s !== "");
     }
 
-    // Fallback to numbered variables VITE_HERO_IMAGE_1, VITE_HERO_IMAGE_2, etc.
-    // We check up to 20 as a reasonable limit for this method
-    for (let i = 1; i <= 20; i++) {
-      const img = import.meta.env[`VITE_HERO_IMAGE_${i}`];
-      if (img) images.push(img);
-    }
+    // 2. Explicitly check for numbered variables (Vite requires literal strings)
+    const img1 = import.meta.env.VITE_HERO_IMAGE_1;
+    const img2 = import.meta.env.VITE_HERO_IMAGE_2;
+    const img3 = import.meta.env.VITE_HERO_IMAGE_3;
+    const img4 = import.meta.env.VITE_HERO_IMAGE_4;
+    const img5 = import.meta.env.VITE_HERO_IMAGE_5;
+    const img6 = import.meta.env.VITE_HERO_IMAGE_6;
+    const img7 = import.meta.env.VITE_HERO_IMAGE_7;
+    const img8 = import.meta.env.VITE_HERO_IMAGE_8;
+
+    if (img1) images.push(img1);
+    if (img2) images.push(img2);
+    if (img3) images.push(img3);
+    if (img4) images.push(img4);
+    if (img5) images.push(img5);
+    if (img6) images.push(img6);
+    if (img7) images.push(img7);
+    if (img8) images.push(img8);
 
     if (images.length > 0) return images;
 
-    // Default placeholders if no environment variables are set
+    // Default placeholders
     return [
       "https://picsum.photos/seed/healthcare-supplement-1/1920/1080",
       "https://picsum.photos/seed/healthcare-supplement-2/1920/1080",

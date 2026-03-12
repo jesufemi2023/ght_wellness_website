@@ -21,19 +21,10 @@ import {
   Truck
 } from 'lucide-react';
 import { Product, PackageData, BlogPost } from '../types';
+import { CONFIG } from '../config';
 import { ProductCard } from './ProductCard';
 import { PackageCard } from './PackageCard';
 import { ComboCard } from './ComboCard';
-
-// Hero images placeholders
-const hero1 = "https://picsum.photos/seed/hero1/1920/1080";
-const hero2 = "https://picsum.photos/seed/hero2/1920/1080";
-const hero3 = "https://picsum.photos/seed/hero3/1920/1080";
-const hero4 = "https://picsum.photos/seed/hero4/1920/1080";
-const hero5 = "https://picsum.photos/seed/hero5/1920/1080";
-const hero6 = "https://picsum.photos/seed/hero6/1920/1080";
-const hero7 = "https://picsum.photos/seed/hero7/1920/1080";
-const hero8 = "https://picsum.photos/seed/hero8/1920/1080";
 
 interface HomeProps {
   products: Product[];
@@ -126,16 +117,7 @@ export function Home({
   // Get top 4 products for bestsellers
   const bestSellers = products.slice(0, 4);
 
-  const heroImages = [
-    hero1,
-    hero2,
-    hero3,
-    hero4,
-    hero5,
-    hero6,
-    hero7,
-    hero8
-  ];
+  const heroImages = CONFIG.heroImages;
 
   const [currentHeroIndex, setCurrentHeroIndex] = useState(0);
 
@@ -164,10 +146,18 @@ export function Home({
                 opacity: { duration: 1.2, ease: "easeInOut" }
               }}
             >
+              {/* Blurred background to fill space without cropping */}
+              <img 
+                src={img} 
+                alt="" 
+                className="absolute inset-0 w-full h-full object-cover blur-3xl opacity-40 scale-110"
+                referrerPolicy="no-referrer"
+              />
+              {/* Main image - now using object-contain to show full image */}
               <img 
                 src={img} 
                 alt={`Hero image ${index + 1}`} 
-                className="w-full h-full object-cover"
+                className="relative w-full h-full object-contain z-10"
                 referrerPolicy="no-referrer"
                 onError={(e) => {
                   (e.target as HTMLImageElement).src = `https://picsum.photos/seed/healthcare-supplement-${index}/1920/1080`;
