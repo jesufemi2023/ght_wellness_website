@@ -133,6 +133,46 @@ export async function createServer() {
     res.json(status);
   });
 
+  // --- Sync Check & Metadata ---
+  async function updateSyncTimestamp() {
+    if (!supabase) return;
+    try {
+      const now = new Date().toISOString();
+      const { error } = await supabase
+        .from('app_metadata')
+        .upsert({ id: 'global_sync', last_updated: now });
+      
+      if (error) {
+        // If table doesn't exist, we might get an error. 
+        // In a real app, we'd ensure the table exists via migration.
+        console.warn("Sync Timestamp Update Error (Table might not exist):", error.message);
+      }
+    } catch (e) {
+      console.error("Failed to update sync timestamp:", e);
+    }
+  }
+
+  app.get("/api/sync-check", async (req, res) => {
+    if (!supabase) return res.json({ last_updated: new Date().toISOString() });
+    
+    try {
+      const { data, error } = await supabase
+        .from('app_metadata')
+        .select('last_updated')
+        .eq('id', 'global_sync')
+        .maybeSingle();
+      
+      if (error || !data) {
+        // Fallback if table doesn't exist or no record
+        return res.json({ last_updated: new Date(0).toISOString() });
+      }
+      
+      res.json(data);
+    } catch (e) {
+      res.json({ last_updated: new Date(0).toISOString() });
+    }
+  });
+
   // --- Admin CRUD Routes ---
 
   // Generic Admin GET
@@ -296,6 +336,7 @@ export async function createServer() {
           const junctionData = product_ids.map(pid => ({ package_id: retryData.id, product_id: pid }));
           await supabase.from('package_products').insert(junctionData);
         }
+        await updateSyncTimestamp();
         return res.json(retryData);
       }
       return res.status(500).json({ error: error.message });
@@ -303,7 +344,7 @@ export async function createServer() {
 
     // Handle junction table for packages
     if (table === 'recommended_packages' && Array.isArray(product_ids)) {
-      const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+      const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
       const validProductIds = product_ids.filter(pid => pid && typeof pid === 'string' && uuidRegex.test(pid));
       
       if (validProductIds.length > 0) {
@@ -315,6 +356,7 @@ export async function createServer() {
       }
     }
 
+    await updateSyncTimestamp();
     res.json(data);
   });
 
@@ -347,6 +389,7 @@ export async function createServer() {
             await supabase.from('package_products').insert(junctionData);
           }
         }
+        await updateSyncTimestamp();
         return res.json(retryData);
       }
       return res.status(500).json({ error: error.message });
@@ -369,6 +412,7 @@ export async function createServer() {
       }
     }
 
+    await updateSyncTimestamp();
     res.json(data);
   });
 
@@ -377,6 +421,7 @@ export async function createServer() {
     const { table, id } = req.params;
     const { error } = await supabase.from(table).delete().eq('id', id);
     if (error) return res.status(500).json({ error: error.message });
+    await updateSyncTimestamp();
     res.json({ success: true });
   });
 

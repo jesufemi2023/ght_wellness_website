@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { BlogPost } from '../../types';
 import { Calendar, ChevronRight, Tag } from 'lucide-react';
+import { getOptimizedImageUrl } from '../../utils/cloudinary';
 
 interface BlogListProps {
   onSelectPost: (id: string) => void;
@@ -59,10 +60,11 @@ export function BlogList({ onSelectPost }: BlogListProps) {
           >
             <div className="aspect-[16/9] overflow-hidden relative">
               <img 
-                src={post.image_url || `https://picsum.photos/seed/supplement-article-${post.id}/800/600`} 
+                src={getOptimizedImageUrl(post.image_url || `https://picsum.photos/seed/supplement-article-${post.id}/800/600`, 800)} 
                 alt={post.title} 
                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                 referrerPolicy="no-referrer"
+                loading="lazy"
                 onError={(e) => {
                   (e.target as HTMLImageElement).src = `https://picsum.photos/seed/healthcare-article-${post.id}/800/600`;
                 }}

@@ -4,6 +4,7 @@ import { ShoppingBag, CheckCircle2, Star, Eye, ChevronRight, ChevronLeft, X, Pho
 import { PackageData, Product } from "../types";
 import { CONFIG } from "../config";
 import { PackageQuickView } from "./PackageQuickView";
+import { getOptimizedImageUrl } from "../utils/cloudinary";
 
 interface ComboCardProps {
   data: PackageData;
@@ -43,10 +44,11 @@ export const ComboCard: React.FC<ComboCardProps> = ({ data, onOrder, onProductCl
           {/* Main Image Container */}
           <div className="flex-grow relative flex items-center justify-center p-4 overflow-hidden bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-white to-slate-50">
             <motion.img 
-              src={data.package_image_url || "https://picsum.photos/seed/wellness-supplement/800/800"} 
+              src={getOptimizedImageUrl(data.package_image_url || "https://picsum.photos/seed/wellness-supplement/800/800", 800)} 
               alt={data.name}
               className="w-full h-full object-contain transition-transform duration-700 ease-out mix-blend-multiply cursor-zoom-in drop-shadow-2xl"
               referrerPolicy="no-referrer"
+              loading="lazy"
               whileHover={{ scale: 2.5 }}
               transition={{ type: "spring", stiffness: 100, damping: 25 }}
               onError={(e) => {

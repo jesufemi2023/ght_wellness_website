@@ -31,6 +31,7 @@ import {
 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { CONFIG } from "./config";
+import { CacheService } from "./utils/cache";
 
 import { Home } from "./components/Home";
 import { PackageCard } from "./components/PackageCard";
@@ -131,8 +132,28 @@ export default function App() {
   }, [distributorId]);
 
   useEffect(() => {
-    fetchProducts();
-    fetchRecommendedPackages();
+    const initApp = async () => {
+      // 1. Try to load from cache first for instant UI
+      const cachedProducts = CacheService.get(CacheService.KEYS.PRODUCTS);
+      const cachedPackages = CacheService.get(CacheService.KEYS.PACKAGES);
+
+      if (cachedProducts) setProducts(cachedProducts);
+      if (cachedPackages) {
+        setRecommendedPackages(cachedPackages.filter((p: any) => !p.is_combo));
+        setComboPackages(cachedPackages.filter((p: any) => p.is_combo));
+      }
+
+      // 2. Check if cache is valid in background
+      const isValid = await CacheService.isCacheValid();
+      
+      if (!isValid || !cachedProducts || !cachedPackages) {
+        // Cache is stale or missing, fetch fresh data
+        fetchProducts();
+        fetchRecommendedPackages();
+      }
+    };
+
+    initApp();
     if (activeTab === "history") fetchHistory();
   }, [activeTab]);
 
@@ -151,6 +172,7 @@ export default function App() {
       const data = await res.json();
       if (Array.isArray(data)) {
         setProducts(data);
+        CacheService.save(CacheService.KEYS.PRODUCTS, data);
       } else {
         console.error("Products data is not an array:", data);
         setProducts([]);
@@ -177,6 +199,7 @@ export default function App() {
       if (Array.isArray(data)) {
         setRecommendedPackages(data.filter(p => !p.is_combo));
         setComboPackages(data.filter(p => p.is_combo));
+        CacheService.save(CacheService.KEYS.PACKAGES, data);
       } else {
         setRecommendedPackages([]);
         setComboPackages([]);

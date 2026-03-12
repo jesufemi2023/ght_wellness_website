@@ -215,7 +215,7 @@ export default function OrdersAdminView({ data, adminPassword, fetchData }: Orde
                                 <ExternalLink size={14} /> View Full Receipt
                               </span>
                             </div>
-                            <img src={order.payment_receipt_url} alt="Payment Receipt" className="w-full h-40 object-cover transform group-hover:scale-110 transition-transform duration-500" />
+                            <img src={order.payment_receipt_url} alt="Payment Receipt" className="w-full h-40 object-contain bg-slate-100 transform group-hover:scale-110 transition-transform duration-500" />
                           </a>
                         </div>
                       )}

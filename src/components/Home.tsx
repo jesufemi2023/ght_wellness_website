@@ -25,6 +25,7 @@ import { CONFIG } from '../config';
 import { ProductCard } from './ProductCard';
 import { PackageCard } from './PackageCard';
 import { ComboCard } from './ComboCard';
+import { getOptimizedImageUrl } from '../utils/cloudinary';
 
 interface HomeProps {
   products: Product[];
@@ -148,19 +149,19 @@ export function Home({
             >
               {/* Blurred background to fill space without cropping */}
               <img 
-                src={img} 
+                src={getOptimizedImageUrl(img, 1200)} 
                 alt="" 
                 className="absolute inset-0 w-full h-full object-cover blur-3xl opacity-40 scale-110"
                 referrerPolicy="no-referrer"
               />
               {/* Main image - now using object-contain to show full image */}
               <img 
-                src={img} 
+                src={getOptimizedImageUrl(img, 1200)} 
                 alt={`Hero image ${index + 1}`} 
                 className="relative w-full h-full object-contain z-10"
                 referrerPolicy="no-referrer"
                 onError={(e) => {
-                  (e.target as HTMLImageElement).src = `https://picsum.photos/seed/healthcare-supplement-${index}/1920/1080`;
+                  (e.target as HTMLImageElement).src = `https://picsum.photos/seed/healthcare-supplement-${index}/1200/675`;
                 }}
               />
               {/* Subtle Overlay for readability only if needed */}
@@ -450,10 +451,11 @@ export function Home({
               >
                 <div className="aspect-[4/3] rounded-3xl overflow-hidden mb-4 relative">
                   <img 
-                    src={post.image_url || `https://picsum.photos/seed/supplement-blog-${post.id}/600/400`} 
+                    src={getOptimizedImageUrl(post.image_url || `https://picsum.photos/seed/supplement-blog-${post.id}/600/400`, 600)} 
                     alt={post.title}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                     referrerPolicy="no-referrer"
+                    loading="lazy"
                     onError={(e) => {
                       (e.target as HTMLImageElement).src = `https://picsum.photos/seed/healthcare-blog-${post.id}/600/400`;
                     }}

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Star, ShieldCheck, ChevronRight, CheckCircle2, Globe, Leaf, Activity, Award, ShoppingBag, Phone } from 'lucide-react';
 import { CONFIG } from '../config';
 import { Product } from '../types';
+import { getOptimizedImageUrl } from '../utils/cloudinary';
 
 interface ProductCardProps {
   product: Product;
@@ -24,12 +25,13 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onQuickView, 
       {/* Image Section - Optimized Aspect Ratio */}
       <div className="relative aspect-[2/1] bg-slate-50/30 flex items-center justify-center overflow-hidden border-b border-slate-100">
         <img 
-          src={product.image_url} 
+          src={getOptimizedImageUrl(product.image_url, 600)} 
           alt={product.name}
           className="w-full h-full object-contain group-hover:scale-150 transition-transform duration-700 p-4 mix-blend-multiply cursor-zoom-in group-hover:drop-shadow-2xl"
           referrerPolicy="no-referrer"
+          loading="lazy"
           onError={(e) => {
-            (e.target as HTMLImageElement).src = `https://picsum.photos/seed/supplement-${product.id}/800/800`;
+            (e.target as HTMLImageElement).src = `https://picsum.photos/seed/supplement-${product.id}/600/450`;
           }}
         />
         

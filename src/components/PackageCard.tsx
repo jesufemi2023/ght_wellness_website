@@ -3,6 +3,7 @@ import { Star, ShieldCheck, ChevronRight, CheckCircle2, Globe, Truck, Eye, Leaf,
 import { CONFIG } from '../config';
 import { PackageQuickView } from './PackageQuickView';
 import { PackageData, Product } from '../types';
+import { getOptimizedImageUrl } from '../utils/cloudinary';
 
 interface PackageCardProps {
   data: PackageData;
@@ -28,13 +29,13 @@ export const PackageCard: React.FC<PackageCardProps> = ({ data, allPackages, onO
         {/* Image Section - Optimized Aspect Ratio */}
         <div className="relative aspect-[2/1] bg-slate-50/30 flex items-center justify-center overflow-hidden border-b border-slate-100">
           <img 
-            src={data.package_image_url || (data.products[0]?.image_url)} 
+            src={getOptimizedImageUrl(data.package_image_url || (data.products[0]?.image_url), 600)} 
             alt={data.name}
             className="w-full h-full object-contain group-hover:scale-150 transition-transform duration-700 p-4 mix-blend-multiply cursor-zoom-in group-hover:drop-shadow-2xl"
             referrerPolicy="no-referrer"
             loading="lazy"
             onError={(e) => {
-              (e.target as HTMLImageElement).src = `https://picsum.photos/seed/healthcare-${data.id}/800/800`;
+              (e.target as HTMLImageElement).src = `https://picsum.photos/seed/healthcare-${data.id}/600/300`;
             }}
           />
           

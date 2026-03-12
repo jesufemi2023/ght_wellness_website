@@ -4,6 +4,7 @@ import { ArrowLeft, Calendar, Tag, Share2, CheckCircle2, Star, ShieldCheck, Truc
 import { CONFIG } from '../../config';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
+import { getOptimizedImageUrl } from '../../utils/cloudinary';
 
 interface BlogPostProps {
   id: string;
@@ -170,12 +171,12 @@ export function BlogPost({ id, onBack, onOrderPackage }: BlogPostProps) {
       <div className="max-w-5xl mx-auto px-4 md:px-8 mb-12">
         <div className="aspect-[21/9] w-full rounded-3xl overflow-hidden bg-slate-100 shadow-xl shadow-slate-200/50 border border-slate-100">
           <img 
-            src={post.image_url || `https://picsum.photos/seed/supplement-hero-${post.id}/1920/1080`} 
+            src={getOptimizedImageUrl(post.image_url || `https://picsum.photos/seed/supplement-hero-${post.id}/1920/1080`, 1200)} 
             alt={post.title}
             className="w-full h-full object-cover"
             referrerPolicy="no-referrer"
             onError={(e) => {
-              (e.target as HTMLImageElement).src = `https://picsum.photos/seed/healthcare-hero-${post.id}/1920/1080`;
+              (e.target as HTMLImageElement).src = `https://picsum.photos/seed/healthcare-hero-${post.id}/1200/675`;
             }}
           />
         </div>
@@ -203,10 +204,11 @@ export function BlogPost({ id, onBack, onOrderPackage }: BlogPostProps) {
                   <div className="flex flex-col sm:flex-row gap-6 items-center">
                     <div className="w-full sm:w-1/3 aspect-square rounded-2xl overflow-hidden bg-slate-50 relative group">
                       <img 
-                        src={post.recommended_package.package_image_url || `https://picsum.photos/seed/supplement-pkg-${post.recommended_package.id}/400/400`} 
+                        src={getOptimizedImageUrl(post.recommended_package.package_image_url || `https://picsum.photos/seed/supplement-pkg-${post.recommended_package.id}/400/400`, 600)} 
                         alt={post.recommended_package.name}
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                         referrerPolicy="no-referrer"
+                        loading="lazy"
                         onError={(e) => {
                           (e.target as HTMLImageElement).src = `https://picsum.photos/seed/healthcare-pkg-${post.recommended_package.id}/400/400`;
                         }}
@@ -310,10 +312,11 @@ export function BlogPost({ id, onBack, onOrderPackage }: BlogPostProps) {
                   <div className="p-6">
                     <div className="aspect-square rounded-2xl overflow-hidden bg-slate-50 mb-6 relative group">
                       <img 
-                        src={post.recommended_package.package_image_url || `https://picsum.photos/seed/supplement-side-${post.recommended_package.id}/400/400`} 
+                        src={getOptimizedImageUrl(post.recommended_package.package_image_url || `https://picsum.photos/seed/supplement-side-${post.recommended_package.id}/400/400`, 600)} 
                         alt={post.recommended_package.name}
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                         referrerPolicy="no-referrer"
+                        loading="lazy"
                         onError={(e) => {
                           (e.target as HTMLImageElement).src = `https://picsum.photos/seed/healthcare-side-${post.recommended_package.id}/400/400`;
                         }}

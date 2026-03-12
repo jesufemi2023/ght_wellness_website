@@ -27,6 +27,7 @@ import OrdersAdminView from "./OrdersAdminView";
 import ConsultationsAdminView from "./ConsultationsAdminView";
 import { Order, Consultation, BlogPost } from "../types";
 import { BlogAdmin } from "./blog/BlogAdmin";
+import { getOptimizedImageUrl } from "../utils/cloudinary";
 
 interface AdminDashboardProps {
   adminPassword: string;
@@ -734,7 +735,7 @@ export default function AdminDashboard({ adminPassword }: AdminDashboardProps) {
                           ) : (
                             <div className="flex gap-6">
                               <div className="w-32 h-20 rounded-xl overflow-hidden border border-slate-100 shrink-0">
-                                <img src={item.image_url} alt={item.title} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+                                <img src={getOptimizedImageUrl(item.image_url, 300)} alt={item.title} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
                               </div>
                               <div className="space-y-1">
                                 <h4 className="font-black text-slate-900 text-lg tracking-tight">{item.title}</h4>
