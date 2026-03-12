@@ -28,6 +28,9 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onQuickView, 
           alt={product.name}
           className="w-full h-full object-contain group-hover:scale-150 transition-transform duration-700 p-4 mix-blend-multiply cursor-zoom-in group-hover:drop-shadow-2xl"
           referrerPolicy="no-referrer"
+          onError={(e) => {
+            (e.target as HTMLImageElement).src = `https://picsum.photos/seed/supplement-${product.id}/800/800`;
+          }}
         />
         
         {/* Logo Overlay - Top Left - Increased Size */}

@@ -33,6 +33,9 @@ export const PackageCard: React.FC<PackageCardProps> = ({ data, allPackages, onO
             className="w-full h-full object-contain group-hover:scale-150 transition-transform duration-700 p-4 mix-blend-multiply cursor-zoom-in group-hover:drop-shadow-2xl"
             referrerPolicy="no-referrer"
             loading="lazy"
+            onError={(e) => {
+              (e.target as HTMLImageElement).src = `https://picsum.photos/seed/healthcare-${data.id}/800/800`;
+            }}
           />
           
           {/* Logo Overlay - Top Left - Increased Size */}

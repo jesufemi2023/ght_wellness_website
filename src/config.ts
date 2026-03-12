@@ -22,6 +22,31 @@ export const CONFIG = {
   defaults: {
     distributorId: import.meta.env.VITE_DEFAULT_DISTRIBUTOR_ID || "SD-GHT-MEMBER-001",
   },
+  heroImages: (() => {
+    const images: string[] = [];
+    const csvImages = import.meta.env.VITE_HERO_IMAGES;
+    
+    if (csvImages) {
+      return csvImages.split(',').map((s: string) => s.trim()).filter((s: string) => s !== "");
+    }
+
+    // Fallback to numbered variables VITE_HERO_IMAGE_1, VITE_HERO_IMAGE_2, etc.
+    // We check up to 20 as a reasonable limit for this method
+    for (let i = 1; i <= 20; i++) {
+      const img = import.meta.env[`VITE_HERO_IMAGE_${i}`];
+      if (img) images.push(img);
+    }
+
+    if (images.length > 0) return images;
+
+    // Default placeholders if no environment variables are set
+    return [
+      "https://picsum.photos/seed/healthcare-supplement-1/1920/1080",
+      "https://picsum.photos/seed/healthcare-supplement-2/1920/1080",
+      "https://picsum.photos/seed/healthcare-supplement-3/1920/1080",
+      "https://picsum.photos/seed/healthcare-supplement-4/1920/1080",
+    ];
+  })(),
   navigation: [
     { id: "home", label: "Home" },
     { id: "products", label: "Products" },

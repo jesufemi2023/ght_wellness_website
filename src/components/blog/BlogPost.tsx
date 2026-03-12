@@ -170,10 +170,13 @@ export function BlogPost({ id, onBack, onOrderPackage }: BlogPostProps) {
       <div className="max-w-5xl mx-auto px-4 md:px-8 mb-12">
         <div className="aspect-[21/9] w-full rounded-3xl overflow-hidden bg-slate-100 shadow-xl shadow-slate-200/50 border border-slate-100">
           <img 
-            src={post.image_url || 'https://picsum.photos/seed/health/1920/1080'} 
+            src={post.image_url || `https://picsum.photos/seed/supplement-hero-${post.id}/1920/1080`} 
             alt={post.title}
             className="w-full h-full object-cover"
             referrerPolicy="no-referrer"
+            onError={(e) => {
+              (e.target as HTMLImageElement).src = `https://picsum.photos/seed/healthcare-hero-${post.id}/1920/1080`;
+            }}
           />
         </div>
       </div>
@@ -200,10 +203,13 @@ export function BlogPost({ id, onBack, onOrderPackage }: BlogPostProps) {
                   <div className="flex flex-col sm:flex-row gap-6 items-center">
                     <div className="w-full sm:w-1/3 aspect-square rounded-2xl overflow-hidden bg-slate-50 relative group">
                       <img 
-                        src={post.recommended_package.package_image_url || 'https://picsum.photos/seed/package/400/400'} 
+                        src={post.recommended_package.package_image_url || `https://picsum.photos/seed/supplement-pkg-${post.recommended_package.id}/400/400`} 
                         alt={post.recommended_package.name}
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                         referrerPolicy="no-referrer"
+                        onError={(e) => {
+                          (e.target as HTMLImageElement).src = `https://picsum.photos/seed/healthcare-pkg-${post.recommended_package.id}/400/400`;
+                        }}
                       />
                       {post.recommended_package.discount > 0 && (
                         <div className="absolute top-3 right-3 bg-red-500 text-white text-[11px] font-black px-3 py-1 rounded-full uppercase tracking-widest shadow-md">
@@ -304,10 +310,13 @@ export function BlogPost({ id, onBack, onOrderPackage }: BlogPostProps) {
                   <div className="p-6">
                     <div className="aspect-square rounded-2xl overflow-hidden bg-slate-50 mb-6 relative group">
                       <img 
-                        src={post.recommended_package.package_image_url || 'https://picsum.photos/seed/package/400/400'} 
+                        src={post.recommended_package.package_image_url || `https://picsum.photos/seed/supplement-side-${post.recommended_package.id}/400/400`} 
                         alt={post.recommended_package.name}
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                         referrerPolicy="no-referrer"
+                        onError={(e) => {
+                          (e.target as HTMLImageElement).src = `https://picsum.photos/seed/healthcare-side-${post.recommended_package.id}/400/400`;
+                        }}
                       />
                       {post.recommended_package.discount > 0 && (
                         <div className="absolute top-3 right-3 bg-red-500 text-white text-[11px] font-black px-3 py-1 rounded-full uppercase tracking-widest shadow-md">

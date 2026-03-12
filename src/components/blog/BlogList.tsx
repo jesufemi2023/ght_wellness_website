@@ -59,10 +59,13 @@ export function BlogList({ onSelectPost }: BlogListProps) {
           >
             <div className="aspect-[16/9] overflow-hidden relative">
               <img 
-                src={post.image_url || 'https://picsum.photos/seed/health/800/600'} 
+                src={post.image_url || `https://picsum.photos/seed/supplement-article-${post.id}/800/600`} 
                 alt={post.title} 
                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                 referrerPolicy="no-referrer"
+                onError={(e) => {
+                  (e.target as HTMLImageElement).src = `https://picsum.photos/seed/healthcare-article-${post.id}/800/600`;
+                }}
               />
               {post.category && (
                 <div className="absolute top-4 left-4 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full text-xs font-bold text-emerald-700 uppercase tracking-widest">

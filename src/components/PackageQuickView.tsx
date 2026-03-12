@@ -83,6 +83,9 @@ export const PackageQuickView: React.FC<PackageQuickViewProps> = ({
                       className="w-full max-h-[400px] object-contain mix-blend-multiply drop-shadow-[0_20px_50px_rgba(0,0,0,0.1)]" 
                       referrerPolicy="no-referrer"
                       loading="lazy"
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).src = `https://picsum.photos/seed/healthcare-quick-${data.id}/800/800`;
+                      }}
                     />
                   </div>
                 </div>
@@ -102,6 +105,9 @@ export const PackageQuickView: React.FC<PackageQuickViewProps> = ({
                             alt={product.name} 
                             className="w-full h-full object-contain mix-blend-multiply"
                             referrerPolicy="no-referrer"
+                            onError={(e) => {
+                              (e.target as HTMLImageElement).src = `https://picsum.photos/seed/supplement-item-${product.id}/400/400`;
+                            }}
                           />
                         </div>
                         <div className="flex-grow min-w-0">

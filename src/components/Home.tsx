@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { motion, AnimatePresence } from 'motion/react';
+import { motion } from 'motion/react';
 import { 
   ArrowRight, 
   ShieldCheck, 
@@ -25,53 +25,15 @@ import { ProductCard } from './ProductCard';
 import { PackageCard } from './PackageCard';
 import { ComboCard } from './ComboCard';
 
-// Hero images are served from the public folder
-const HERO_IMAGES = [
-  '/hero1.jpg',
-  '/hero2.jpg',
-  '/hero3.jpg',
-  '/hero4.jpg',
-  '/hero5.jpg',
-  '/hero6.jpg',
-  '/hero7.jpg',
-  '/hero8.jpg'
-];
-
-// Sub-component for individual slides to handle loading and animation
-const HeroSlide = ({ src, isActive, index }: { src: string; isActive: boolean; index: number }) => {
-  const [isLoaded, setIsLoaded] = useState(false);
-
-  return (
-    <motion.div
-      className="absolute inset-0"
-      initial={{ opacity: 0 }}
-      animate={{ 
-        opacity: isActive ? 1 : 0,
-        scale: isActive ? 1.1 : 1,
-      }}
-      transition={{ 
-        opacity: { duration: 1.5, ease: "easeInOut" },
-        scale: { duration: 10, ease: "linear" } // Ken Burns effect
-      }}
-    >
-      <img
-        src={src}
-        alt={`GHT Wellness Hero ${index + 1}`}
-        onLoad={() => setIsLoaded(true)}
-        className={`w-full h-full object-cover transition-opacity duration-1000 ${isLoaded ? 'opacity-100' : 'opacity-0'}`}
-        loading={index === 0 ? "eager" : "lazy"}
-        referrerPolicy="no-referrer"
-      />
-      {!isLoaded && (
-        <div className="absolute inset-0 bg-slate-900 flex items-center justify-center">
-          <div className="w-12 h-12 border-4 border-emerald-500/20 border-t-emerald-500 rounded-full animate-spin"></div>
-        </div>
-      )}
-      {/* Gradient Overlay for better text contrast */}
-      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent"></div>
-    </motion.div>
-  );
-};
+// Hero images placeholders
+const hero1 = "https://picsum.photos/seed/hero1/1920/1080";
+const hero2 = "https://picsum.photos/seed/hero2/1920/1080";
+const hero3 = "https://picsum.photos/seed/hero3/1920/1080";
+const hero4 = "https://picsum.photos/seed/hero4/1920/1080";
+const hero5 = "https://picsum.photos/seed/hero5/1920/1080";
+const hero6 = "https://picsum.photos/seed/hero6/1920/1080";
+const hero7 = "https://picsum.photos/seed/hero7/1920/1080";
+const hero8 = "https://picsum.photos/seed/hero8/1920/1080";
 
 interface HomeProps {
   products: Product[];
@@ -164,83 +126,78 @@ export function Home({
   // Get top 4 products for bestsellers
   const bestSellers = products.slice(0, 4);
 
-  const [currentHeroIndex, setCurrentHeroIndex] = useState(0);
+  const heroImages = [
+    hero1,
+    hero2,
+    hero3,
+    hero4,
+    hero5,
+    hero6,
+    hero7,
+    hero8
+  ];
 
-  // Preload next image in sequence
-  useEffect(() => {
-    const nextIndex = (currentHeroIndex + 1) % HERO_IMAGES.length;
-    const img = new Image();
-    img.src = HERO_IMAGES[nextIndex];
-  }, [currentHeroIndex]);
+  const [currentHeroIndex, setCurrentHeroIndex] = useState(0);
 
   useEffect(() => {
     const timer = setInterval(() => {
-      setCurrentHeroIndex((prev) => (prev + 1) % HERO_IMAGES.length);
+      setCurrentHeroIndex((prev) => (prev + 1) % heroImages.length);
     }, 5000); // Change image every 5 seconds
     return () => clearInterval(timer);
-  }, []);
+  }, [heroImages.length]);
 
   return (
     <div className="space-y-12 md:space-y-16 pb-12">
       
       {/* 1. Hero Section - Full Screen Display */}
-      <section className="relative h-[calc(100vh-4rem)] md:h-[calc(100vh-5rem)] w-full overflow-hidden bg-slate-950 group">
+      <section className="relative h-[calc(100vh-4rem)] md:h-[calc(100vh-5rem)] w-full overflow-hidden bg-black group">
         <div className="absolute inset-0">
-          {HERO_IMAGES.map((src, index) => (
-            <HeroSlide 
-              key={src} 
-              src={src} 
-              isActive={index === currentHeroIndex} 
-              index={index} 
-            />
+          {heroImages.map((img, index) => (
+            <motion.div
+              key={index}
+              className="absolute inset-0 flex items-center justify-center"
+              initial={{ opacity: 0 }}
+              animate={{ 
+                opacity: index === currentHeroIndex ? 1 : 0,
+              }}
+              transition={{ 
+                opacity: { duration: 1.2, ease: "easeInOut" }
+              }}
+            >
+              <img 
+                src={img} 
+                alt={`Hero image ${index + 1}`} 
+                className="w-full h-full object-cover"
+                referrerPolicy="no-referrer"
+                onError={(e) => {
+                  (e.target as HTMLImageElement).src = `https://picsum.photos/seed/healthcare-supplement-${index}/1920/1080`;
+                }}
+              />
+              {/* Subtle Overlay for readability only if needed */}
+              <div className="absolute inset-0 bg-black/20"></div>
+            </motion.div>
           ))}
         </div>
         
-        {/* Progress Bar */}
-        <div className="absolute top-0 left-0 right-0 h-1 z-30 flex gap-1 px-4 py-2">
-          {HERO_IMAGES.map((_, index) => (
-            <div key={index} className="flex-1 h-1 bg-white/10 rounded-full overflow-hidden">
-              {index === currentHeroIndex && (
-                <motion.div 
-                  className="h-full bg-emerald-500"
-                  initial={{ width: "0%" }}
-                  animate={{ width: "100%" }}
-                  transition={{ duration: 5, ease: "linear" }}
-                  key={currentHeroIndex}
-                />
-              )}
-              {index < currentHeroIndex && <div className="h-full w-full bg-emerald-500/40" />}
-            </div>
-          ))}
-        </div>
-
-        <div className="relative z-10 h-full flex flex-col items-center md:items-end justify-center md:justify-end p-6 md:p-16 pointer-events-none">
+        <div className="relative z-10 h-full flex flex-col items-end justify-end p-10 pointer-events-none">
           <motion.div 
-            initial={{ opacity: 0, y: 40 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.5 }}
-            className="pointer-events-auto text-center md:text-right max-w-2xl"
+            initial={{ opacity: 0, x: 40 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.8, delay: 1 }}
+            className="pointer-events-auto"
           >
-            <h2 className="text-4xl md:text-7xl font-black text-white mb-6 leading-tight drop-shadow-2xl">
-              Your Journey to <br />
-              <span className="text-emerald-400">Optimal Health</span>
-            </h2>
-            <p className="text-lg md:text-xl text-white/80 mb-8 font-medium drop-shadow-lg hidden md:block">
-              Discover the power of nature combined with modern science. <br />
-              Premium herbal solutions for a vibrant life.
-            </p>
             <button 
               onClick={() => onNavigate('products')}
-              className="bg-emerald-600 text-white px-10 py-5 rounded-2xl font-black text-xl hover:bg-emerald-500 transition-all duration-300 shadow-[0_20px_50px_rgba(16,185,129,0.3)] hover:scale-105 active:scale-95 flex items-center justify-center gap-3 mx-auto md:mr-0"
+              className="bg-emerald-600 text-white px-8 py-4 rounded-full font-black text-xl hover:bg-emerald-500 transition-all duration-300 shadow-2xl hover:scale-105 active:scale-95 flex items-center justify-center gap-3"
             >
-              Start Shopping <ShoppingBag size={24} />
+              Shop Now <ShoppingBag size={24} />
             </button>
           </motion.div>
         </div>
 
         {/* Carousel Indicators */}
         <div className="absolute bottom-10 left-0 right-0 flex justify-center gap-4 z-20">
-          {HERO_IMAGES.map((_, index) => (
+          {heroImages.map((_, index) => (
             <button
               key={index}
               onClick={() => setCurrentHeroIndex(index)}
@@ -255,13 +212,13 @@ export function Home({
         {/* Carousel Controls */}
         <div className="hidden md:block">
           <button 
-            onClick={() => setCurrentHeroIndex((prev) => (prev - 1 + HERO_IMAGES.length) % HERO_IMAGES.length)}
+            onClick={() => setCurrentHeroIndex((prev) => (prev - 1 + heroImages.length) % heroImages.length)}
             className="absolute left-8 top-1/2 -translate-y-1/2 w-16 h-16 rounded-full bg-white/10 text-white flex items-center justify-center backdrop-blur-md border border-white/20 opacity-0 group-hover:opacity-100 transition-all hover:bg-white hover:text-slate-900 z-20"
           >
             <ChevronLeft size={32} />
           </button>
           <button 
-            onClick={() => setCurrentHeroIndex((prev) => (prev + 1) % HERO_IMAGES.length)}
+            onClick={() => setCurrentHeroIndex((prev) => (prev + 1) % heroImages.length)}
             className="absolute right-8 top-1/2 -translate-y-1/2 w-16 h-16 rounded-full bg-white/10 text-white flex items-center justify-center backdrop-blur-md border border-white/20 opacity-0 group-hover:opacity-100 transition-all hover:bg-white hover:text-slate-900 z-20"
           >
             <ChevronRight size={32} />
@@ -503,10 +460,13 @@ export function Home({
               >
                 <div className="aspect-[4/3] rounded-3xl overflow-hidden mb-4 relative">
                   <img 
-                    src={post.image_url || 'https://picsum.photos/seed/health/600/400'} 
+                    src={post.image_url || `https://picsum.photos/seed/supplement-blog-${post.id}/600/400`} 
                     alt={post.title}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                     referrerPolicy="no-referrer"
+                    onError={(e) => {
+                      (e.target as HTMLImageElement).src = `https://picsum.photos/seed/healthcare-blog-${post.id}/600/400`;
+                    }}
                   />
                   {post.category && (
                     <div className="absolute top-4 left-4 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full text-[10px] font-black text-emerald-700 uppercase tracking-widest">
