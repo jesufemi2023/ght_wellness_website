@@ -292,131 +292,139 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-[#F8FAFC] font-sans text-slate-900">
-      {/* Top Announcement Bar */}
-      <div className="bg-emerald-900 text-white py-2 px-4 text-center text-[10px] md:text-xs font-black uppercase tracking-[0.2em] relative z-[60]">
-        <div className="max-w-7xl mx-auto flex items-center justify-center gap-4 md:gap-8">
-          <span className="flex items-center gap-2">
-            <Globe size={14} className="text-emerald-400" />
-            Free Delivery Across Nigeria
-          </span>
-          <div className="w-[1px] h-3 bg-white/20 hidden sm:block"></div>
-          <span className="flex items-center gap-2">
-            <Truck size={14} className="text-emerald-400" />
-            We Deliver Worldwide
-          </span>
+      {/* Sticky Top Navigation Container */}
+      <div className="sticky top-0 z-50 shadow-sm">
+        {/* Top Announcement Bar */}
+        <div className="bg-emerald-900 text-white py-2 px-4 text-center text-[9px] md:text-xs font-black uppercase tracking-[0.1em] md:tracking-[0.2em]">
+          <div className="max-w-7xl mx-auto flex items-center justify-center gap-3 md:gap-8">
+            <span className="flex items-center gap-1.5">
+              <Globe size={12} className="text-emerald-400" />
+              Free Delivery Across Nigeria
+            </span>
+            <div className="w-[1px] h-3 bg-white/20 hidden sm:block"></div>
+            <span className="flex items-center gap-1.5">
+              <Truck size={12} className="text-emerald-400" />
+              We Deliver Worldwide
+            </span>
+            <div className="w-[1px] h-3 bg-white/20 hidden sm:block"></div>
+            <span className="flex items-center gap-1.5">
+              <CheckCircle2 size={12} className="text-emerald-400" />
+              Pay on Delivery
+            </span>
+          </div>
         </div>
-      </div>
 
-      {/* Header */}
-      <header className="bg-white border-b border-slate-200 sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 h-16 md:h-20 flex items-center justify-between">
-          <div className="flex items-center gap-2 md:gap-3">
-            {CONFIG.company.logoUrl ? (
-              <img 
-                src={CONFIG.company.logoUrl} 
-                alt={CONFIG.company.name} 
-                className="h-8 md:h-12 w-auto object-contain"
-                referrerPolicy="no-referrer"
-              />
-            ) : (
-              <div className="w-8 h-8 md:w-10 md:h-10 bg-emerald-600 rounded-lg md:rounded-xl flex items-center justify-center text-white shadow-lg">
-                <Activity size={18} className="md:hidden" />
-                <Activity size={24} className="hidden md:block" />
+        {/* Header */}
+        <header className="bg-white border-b border-slate-200">
+          <div className="max-w-7xl mx-auto px-4 h-16 md:h-20 flex items-center justify-between">
+            <div className="flex items-center gap-2 md:gap-3">
+              {CONFIG.company.logoUrl ? (
+                <img 
+                  src={CONFIG.company.logoUrl} 
+                  alt={CONFIG.company.name} 
+                  className="h-8 md:h-12 w-auto object-contain"
+                  referrerPolicy="no-referrer"
+                />
+              ) : (
+                <div className="w-8 h-8 md:w-10 md:h-10 bg-emerald-600 rounded-lg md:rounded-xl flex items-center justify-center text-white shadow-lg">
+                  <Activity size={18} className="md:hidden" />
+                  <Activity size={24} className="hidden md:block" />
+                </div>
+              )}
+              <div className="flex flex-col">
+                <h1 className="font-bold text-sm md:text-xl tracking-tight text-slate-800 leading-none">{CONFIG.company.name}</h1>
+                <p className="text-[8px] md:text-[10px] uppercase tracking-[0.1em] md:tracking-[0.2em] font-semibold text-emerald-600 mt-0.5">{CONFIG.company.subtitle}</p>
               </div>
+            </div>
+
+            {/* Desktop Navigation */}
+            <nav className="hidden lg:flex items-center gap-8">
+              {CONFIG.navigation.map((item) => {
+                const Icon = item.id === "home" ? HomeIcon :
+                             item.id === "products" ? ShoppingBag : 
+                             item.id === "consultation" ? Stethoscope : 
+                             item.id === "history" ? History :
+                             item.id === "combo" ? Package :
+                             item.id === "blog" ? FileText :
+                             item.id === "admin" ? DbIcon : User;
+                return (
+                  <button
+                    key={item.id}
+                    onClick={() => navigateTo(item.id as any)}
+                    className={`flex items-center gap-2 text-sm font-medium transition-colors ${
+                      activeTab === item.id ? "text-emerald-600" : "text-slate-500 hover:text-emerald-500"
+                    }`}
+                  >
+                    <Icon size={18} />
+                    {item.label}
+                  </button>
+                );
+              })}
+            </nav>
+
+            <div className="flex items-center gap-2 md:gap-4">
+              <button className="p-2 text-slate-400 hover:text-emerald-500 transition-colors hidden sm:block">
+                <Search size={20} />
+              </button>
+              <div className="hidden sm:block h-8 w-[1px] bg-slate-200 mx-1 md:mx-2"></div>
+              <div className="hidden xs:flex items-center gap-1.5 md:gap-2 px-2 md:px-3 py-1 md:py-1.5 bg-emerald-50 text-emerald-700 rounded-full text-[10px] md:text-xs font-bold border border-emerald-100">
+                <ShieldCheck size={12} className="md:hidden" />
+                <ShieldCheck size={14} className="hidden md:block" />
+                <span className="whitespace-nowrap">RLS SECURE</span>
+              </div>
+              
+              {/* Mobile Menu Toggle */}
+              <button 
+                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                className="lg:hidden p-2 text-slate-600 hover:bg-slate-100 rounded-lg transition-colors"
+              >
+                {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+              </button>
+            </div>
+          </div>
+
+          {/* Mobile Navigation Menu */}
+          <AnimatePresence>
+            {isMobileMenuOpen && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: "auto" }}
+                exit={{ opacity: 0, height: 0 }}
+                className="lg:hidden bg-white border-t border-slate-100 overflow-hidden"
+              >
+                <div className="px-4 py-6 space-y-4">
+                  {CONFIG.navigation.map((item) => {
+                    const Icon = item.id === "home" ? HomeIcon :
+                                 item.id === "products" ? ShoppingBag : 
+                                 item.id === "consultation" ? Stethoscope : 
+                                 item.id === "history" ? History :
+                                 item.id === "combo" ? Package :
+                                 item.id === "blog" ? FileText :
+                                 item.id === "admin" ? DbIcon : User;
+                    return (
+                      <button
+                        key={item.id}
+                        onClick={() => {
+                          navigateTo(item.id as any);
+                          setIsMobileMenuOpen(false);
+                        }}
+                        className={`flex items-center gap-4 w-full p-4 rounded-2xl text-base font-bold transition-all ${
+                          activeTab === item.id 
+                            ? "bg-emerald-50 text-emerald-700" 
+                            : "text-slate-600 hover:bg-slate-50"
+                        }`}
+                      >
+                        <Icon size={22} />
+                        {item.label}
+                      </button>
+                    );
+                  })}
+                </div>
+              </motion.div>
             )}
-            <div className="flex flex-col">
-              <h1 className="font-bold text-sm md:text-xl tracking-tight text-slate-800 leading-none">{CONFIG.company.name}</h1>
-              <p className="text-[8px] md:text-[10px] uppercase tracking-[0.1em] md:tracking-[0.2em] font-semibold text-emerald-600 mt-0.5">{CONFIG.company.subtitle}</p>
-            </div>
-          </div>
-
-          {/* Desktop Navigation */}
-          <nav className="hidden lg:flex items-center gap-8">
-            {CONFIG.navigation.map((item) => {
-              const Icon = item.id === "home" ? HomeIcon :
-                           item.id === "products" ? ShoppingBag : 
-                           item.id === "consultation" ? Stethoscope : 
-                           item.id === "history" ? History :
-                           item.id === "combo" ? Package :
-                           item.id === "blog" ? FileText :
-                           item.id === "admin" ? DbIcon : User;
-              return (
-                <button
-                  key={item.id}
-                  onClick={() => navigateTo(item.id as any)}
-                  className={`flex items-center gap-2 text-sm font-medium transition-colors ${
-                    activeTab === item.id ? "text-emerald-600" : "text-slate-500 hover:text-emerald-500"
-                  }`}
-                >
-                  <Icon size={18} />
-                  {item.label}
-                </button>
-              );
-            })}
-          </nav>
-
-          <div className="flex items-center gap-2 md:gap-4">
-            <button className="p-2 text-slate-400 hover:text-emerald-500 transition-colors hidden sm:block">
-              <Search size={20} />
-            </button>
-            <div className="hidden sm:block h-8 w-[1px] bg-slate-200 mx-1 md:mx-2"></div>
-            <div className="hidden xs:flex items-center gap-1.5 md:gap-2 px-2 md:px-3 py-1 md:py-1.5 bg-emerald-50 text-emerald-700 rounded-full text-[10px] md:text-xs font-bold border border-emerald-100">
-              <ShieldCheck size={12} className="md:hidden" />
-              <ShieldCheck size={14} className="hidden md:block" />
-              <span className="whitespace-nowrap">RLS SECURE</span>
-            </div>
-            
-            {/* Mobile Menu Toggle */}
-            <button 
-              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="lg:hidden p-2 text-slate-600 hover:bg-slate-100 rounded-lg transition-colors"
-            >
-              {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
-            </button>
-          </div>
-        </div>
-
-        {/* Mobile Navigation Menu */}
-        <AnimatePresence>
-          {isMobileMenuOpen && (
-            <motion.div
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: "auto" }}
-              exit={{ opacity: 0, height: 0 }}
-              className="lg:hidden bg-white border-t border-slate-100 overflow-hidden"
-            >
-              <div className="px-4 py-6 space-y-4">
-                {CONFIG.navigation.map((item) => {
-                  const Icon = item.id === "home" ? HomeIcon :
-                               item.id === "products" ? ShoppingBag : 
-                               item.id === "consultation" ? Stethoscope : 
-                               item.id === "history" ? History :
-                               item.id === "combo" ? Package :
-                               item.id === "blog" ? FileText :
-                               item.id === "admin" ? DbIcon : User;
-                  return (
-                    <button
-                      key={item.id}
-                      onClick={() => {
-                        navigateTo(item.id as any);
-                        setIsMobileMenuOpen(false);
-                      }}
-                      className={`flex items-center gap-4 w-full p-4 rounded-2xl text-base font-bold transition-all ${
-                        activeTab === item.id 
-                          ? "bg-emerald-50 text-emerald-700" 
-                          : "text-slate-600 hover:bg-slate-50"
-                      }`}
-                    >
-                      <Icon size={22} />
-                      {item.label}
-                    </button>
-                  );
-                })}
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </header>
+          </AnimatePresence>
+        </header>
+      </div>
 
       <main className={`mx-auto transition-all duration-500 ${
         activeTab === "home" 

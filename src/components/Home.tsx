@@ -218,22 +218,22 @@ export function Home({
       </section>
 
       {/* 2. Authority Bar */}
-      <section className="bg-white py-8 md:py-12 shadow-sm border-b border-slate-100">
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-12">
+      <section className="bg-white py-6 md:py-12 shadow-sm border-b border-slate-100">
+        <div className="max-w-7xl mx-auto px-4 md:px-6">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-8 lg:gap-12">
             {[
-              { icon: Globe, title: "Free Delivery", desc: "Across all parts of Nigeria", highlight: true },
-              { icon: Truck, title: "Worldwide Shipping", desc: "We deliver to any country", highlight: true },
-              { icon: Leaf, title: "100% Organic", desc: "Pure herbal ingredients" },
+              { icon: Globe, title: "Free Delivery", desc: "Across Nigeria", highlight: true },
+              { icon: Truck, title: "Worldwide", desc: "Any country", highlight: true },
+              { icon: Leaf, title: "100% Organic", desc: "Pure herbal" },
               { icon: Award, title: "Expert Formulated", desc: "Backed by science" }
             ].map((item, i) => (
-              <div key={i} className={`flex items-center gap-4 p-4 rounded-2xl transition-all ${item.highlight ? 'bg-emerald-600 text-white shadow-lg scale-105' : 'bg-emerald-50 text-emerald-600'}`}>
-                <div className={`w-12 h-12 rounded-xl flex items-center justify-center shrink-0 ${item.highlight ? 'bg-white/20 text-white' : 'bg-emerald-100 text-emerald-600'}`}>
-                  <item.icon size={28} />
+              <div key={i} className={`flex items-center gap-2 md:gap-4 p-3 md:p-4 rounded-xl md:rounded-2xl transition-all ${item.highlight ? 'bg-emerald-600 text-white shadow-lg md:scale-105' : 'bg-emerald-50 text-emerald-600'}`}>
+                <div className={`w-8 h-8 md:w-12 md:h-12 rounded-lg md:rounded-xl flex items-center justify-center shrink-0 ${item.highlight ? 'bg-white/20 text-white' : 'bg-emerald-100 text-emerald-600'}`}>
+                  <item.icon className="w-5 h-5 md:w-7 md:h-7" />
                 </div>
-                <div className="text-left">
-                  <h4 className={`font-black text-base uppercase tracking-tight leading-none mb-1 ${item.highlight ? 'text-white' : 'text-slate-900'}`}>{item.title}</h4>
-                  <p className={`text-[10px] font-bold ${item.highlight ? 'text-emerald-100' : 'text-slate-500'}`}>{item.desc}</p>
+                <div className="text-left min-w-0">
+                  <h4 className={`font-black text-[10px] md:text-base uppercase tracking-tight leading-none mb-0.5 md:mb-1 truncate ${item.highlight ? 'text-white' : 'text-slate-900'}`}>{item.title}</h4>
+                  <p className={`text-[8px] md:text-[10px] font-bold truncate ${item.highlight ? 'text-emerald-100' : 'text-slate-500'}`}>{item.desc}</p>
                 </div>
               </div>
             ))}
@@ -242,28 +242,29 @@ export function Home({
       </section>
 
       {/* 3. Support Center - Differentiating AI vs Expert */}
-      <section className="max-w-7xl mx-auto px-6 py-4">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+      <section className="max-w-7xl mx-auto px-4 md:px-6 py-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
           {/* Smart Health Card */}
           <motion.div 
             whileHover={{ y: -5 }}
-            className="bg-emerald-50 rounded-[2.5rem] p-10 md:p-12 flex flex-col justify-between border-2 border-emerald-100 shadow-sm"
+            className="bg-emerald-50 rounded-[2rem] md:rounded-[2.5rem] p-6 md:p-12 flex flex-col justify-between border-2 border-emerald-100 shadow-sm"
           >
-            <div className="space-y-6">
-              <div className="w-16 h-16 bg-emerald-600 rounded-2xl flex items-center justify-center text-white shadow-lg">
-                <MessageSquare size={32} />
+            <div className="space-y-4 md:space-y-6">
+              <div className="w-12 h-12 md:w-16 md:h-16 bg-emerald-600 rounded-xl md:rounded-2xl flex items-center justify-center text-white shadow-lg">
+                <MessageSquare size={28} className="md:hidden" />
+                <MessageSquare size={32} className="hidden md:block" />
               </div>
-              <div className="space-y-2">
-                <h3 className="text-3xl font-black text-slate-900 uppercase tracking-tight">Instant Health Chat</h3>
-                <p className="text-emerald-700 font-bold text-sm uppercase tracking-widest">Response: Immediate</p>
+              <div className="space-y-1 md:space-y-2">
+                <h3 className="text-2xl md:text-3xl font-black text-slate-900 uppercase tracking-tight">Instant Health Chat</h3>
+                <p className="text-emerald-700 font-bold text-xs md:text-sm uppercase tracking-widest">Response: Immediate</p>
               </div>
-              <p className="text-lg text-slate-600 font-medium leading-relaxed">
+              <p className="text-base md:text-lg text-slate-600 font-medium leading-relaxed">
                 Best for quick questions about herbs, symptoms, or general health advice. Get answers in seconds from our Virtual Guide.
               </p>
             </div>
             <button 
               onClick={onOpenChat}
-              className="mt-10 w-full bg-emerald-600 text-white py-5 rounded-2xl font-black text-lg hover:bg-emerald-700 transition-all flex items-center justify-center gap-3 shadow-xl shadow-emerald-200"
+              className="mt-8 md:mt-10 w-full bg-emerald-600 text-white py-4 md:py-5 rounded-xl md:rounded-2xl font-black text-base md:text-lg hover:bg-emerald-700 transition-all flex items-center justify-center gap-3 shadow-xl shadow-emerald-200"
             >
               Chat with Virtual Guide <Sparkles size={20} />
             </button>
@@ -272,23 +273,24 @@ export function Home({
           {/* Expert Consultation Card */}
           <motion.div 
             whileHover={{ y: -5 }}
-            className="bg-slate-50 rounded-[2.5rem] p-10 md:p-12 flex flex-col justify-between border-2 border-slate-200 shadow-sm"
+            className="bg-slate-50 rounded-[2rem] md:rounded-[2.5rem] p-6 md:p-12 flex flex-col justify-between border-2 border-slate-200 shadow-sm"
           >
-            <div className="space-y-6">
-              <div className="w-16 h-16 bg-slate-900 rounded-2xl flex items-center justify-center text-white shadow-lg">
-                <ClipboardList size={32} />
+            <div className="space-y-4 md:space-y-6">
+              <div className="w-12 h-12 md:w-16 md:h-16 bg-slate-900 rounded-xl md:rounded-2xl flex items-center justify-center text-white shadow-lg">
+                <ClipboardList size={28} className="md:hidden" />
+                <ClipboardList size={32} className="hidden md:block" />
               </div>
-              <div className="space-y-2">
-                <h3 className="text-3xl font-black text-slate-900 uppercase tracking-tight">Expert Assessment</h3>
-                <p className="text-slate-500 font-bold text-sm uppercase tracking-widest">Response: Professional Review</p>
+              <div className="space-y-1 md:space-y-2">
+                <h3 className="text-2xl md:text-3xl font-black text-slate-900 uppercase tracking-tight">Expert Assessment</h3>
+                <p className="text-slate-500 font-bold text-xs md:text-sm uppercase tracking-widest">Response: Professional Review</p>
               </div>
-              <p className="text-lg text-slate-600 font-medium leading-relaxed">
+              <p className="text-base md:text-lg text-slate-600 font-medium leading-relaxed">
                 Best for chronic conditions, detailed history, and getting a personalized herbal routine reviewed by experts.
               </p>
             </div>
             <button 
               onClick={() => onNavigate('consultation')}
-              className="mt-10 w-full bg-slate-900 text-white py-5 rounded-2xl font-black text-lg hover:bg-slate-800 transition-all flex items-center justify-center gap-3 shadow-xl shadow-slate-200"
+              className="mt-8 md:mt-10 w-full bg-slate-900 text-white py-4 md:py-5 rounded-xl md:rounded-2xl font-black text-base md:text-lg hover:bg-slate-800 transition-all flex items-center justify-center gap-3 shadow-xl shadow-slate-200"
             >
               Start Health Assessment <Stethoscope size={20} />
             </button>
@@ -404,29 +406,31 @@ export function Home({
       )}
 
       {/* 7. Ask Virtual Guide Teaser */}
-      <section className="max-w-7xl mx-auto px-6 py-12 md:py-16">
-        <div className="bg-white rounded-[3rem] p-12 md:p-24 text-center border-4 border-emerald-100 relative overflow-hidden shadow-2xl">
+      <section className="max-w-7xl mx-auto px-4 md:px-6 py-12 md:py-16">
+        <div className="bg-white rounded-[2rem] md:rounded-[3rem] p-8 md:p-24 text-center border-4 border-emerald-100 relative overflow-hidden shadow-2xl">
           <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none opacity-20">
             <div className="absolute -top-24 -left-24 w-96 h-96 bg-emerald-200 rounded-full blur-[100px]"></div>
             <div className="absolute -bottom-24 -right-24 w-96 h-96 bg-emerald-300 rounded-full blur-[100px]"></div>
           </div>
           
-          <div className="relative z-10 max-w-3xl mx-auto space-y-10">
-            <div className="w-24 h-24 bg-emerald-600 rounded-3xl flex items-center justify-center mx-auto shadow-2xl text-white mb-8 rotate-3">
-              <Sparkles size={48} />
+          <div className="relative z-10 max-w-3xl mx-auto space-y-6 md:space-y-10">
+            <div className="w-16 h-16 md:w-24 md:h-24 bg-emerald-600 rounded-2xl md:rounded-3xl flex items-center justify-center mx-auto shadow-2xl text-white mb-4 md:mb-8 rotate-3">
+              <Sparkles size={32} className="md:hidden" />
+              <Sparkles size={48} className="hidden md:block" />
             </div>
-            <h2 className="text-5xl md:text-7xl font-black text-slate-900 tracking-tighter leading-none">
+            <h2 className="text-3xl md:text-7xl font-black text-slate-900 tracking-tighter leading-none">
               Instant <span className="text-emerald-600">Health Chat</span>
             </h2>
-            <p className="text-2xl md:text-3xl text-slate-600 font-bold leading-relaxed">
+            <p className="text-lg md:text-3xl text-slate-600 font-bold leading-relaxed">
               Have a quick question? Our Virtual Health Guide is available 24/7 for immediate guidance.
             </p>
-            <div className="pt-6">
+            <div className="pt-4 md:pt-6">
               <button 
                 onClick={onOpenChat}
-                className="bg-emerald-600 text-white px-16 py-6 rounded-full font-black text-2xl hover:bg-emerald-700 transition-all shadow-2xl shadow-emerald-200 uppercase tracking-widest flex items-center justify-center gap-4 mx-auto"
+                className="bg-emerald-600 text-white px-8 md:px-16 py-4 md:py-6 rounded-full font-black text-lg md:text-2xl hover:bg-emerald-700 transition-all shadow-2xl shadow-emerald-200 uppercase tracking-widest flex items-center justify-center gap-3 md:gap-4 mx-auto"
               >
-                Chat with Virtual Guide <MessageSquare size={32} />
+                Chat with Virtual Guide <MessageSquare size={24} className="md:hidden" />
+                <MessageSquare size={32} className="hidden md:block" />
               </button>
             </div>
           </div>
