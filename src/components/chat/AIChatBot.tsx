@@ -150,18 +150,18 @@ export const AIChatBot: React.FC<AIChatBotProps> = ({ onProductClick, isOpen, se
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0, opacity: 0 }}
             onClick={() => setIsOpen(true)}
-            className="fixed bottom-6 right-6 p-4 bg-emerald-600 text-white rounded-full shadow-2xl hover:bg-emerald-700 transition-all z-[60] flex items-center justify-center group"
+            className="fixed bottom-6 right-6 md:bottom-10 md:right-10 p-4 md:p-5 bg-emerald-600 text-white rounded-full shadow-2xl hover:bg-emerald-700 transition-all z-[60] flex items-center justify-center group"
           >
             {/* Pulsing ring effect */}
             <span className="absolute inset-0 rounded-full bg-emerald-600 animate-ping opacity-75"></span>
             
             {/* Tooltip to draw attention */}
-            <span className="absolute -top-12 right-0 bg-white text-emerald-700 px-4 py-2 rounded-xl text-sm font-black shadow-xl whitespace-nowrap border border-emerald-100 animate-bounce">
+            <span className="absolute -top-14 right-0 bg-white text-emerald-700 px-5 py-3 rounded-2xl text-sm md:text-base font-black shadow-2xl whitespace-nowrap border-2 border-emerald-100 animate-bounce">
               Ask Dr. GHT ✨
-              <div className="absolute -bottom-1.5 right-6 w-3 h-3 bg-white border-b border-r border-emerald-100 transform rotate-45"></div>
+              <div className="absolute -bottom-2 right-8 w-4 h-4 bg-white border-b-2 border-r-2 border-emerald-100 transform rotate-45"></div>
             </span>
             
-            <Bot size={28} className="relative z-10" />
+            <Bot size={32} className="relative z-10" />
           </motion.button>
         )}
       </AnimatePresence>

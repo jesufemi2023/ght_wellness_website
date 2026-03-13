@@ -73,12 +73,12 @@ export const CONFIG = {
   navigation: [
     { id: "home", label: "Home" },
     { id: "about", label: "About Us" },
-    { id: "products", label: "Products" },
-    { id: "recommended", label: "Recommended" },
-    { id: "combo", label: "Combo Packs" },
-    { id: "blog", label: "Health Blog" },
-    { id: "consultation", label: "Consultation" },
-    { id: "history", label: "My Records" },
+    { id: "products", label: "Shop Products" },
+    { id: "recommended", label: "Health Packages" },
+    { id: "combo", label: "Value Bundles" },
+    { id: "blog", label: "Health Tips" },
+    { id: "consultation", label: "Free Consultation" },
+    { id: "history", label: "My Orders" },
     { id: "admin", label: "Admin" },
   ],
 };

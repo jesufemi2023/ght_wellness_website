@@ -11,6 +11,7 @@ import {
   CheckCircle2,
   Database as DbIcon,
   ShieldCheck,
+  LayoutGrid,
   Globe,
   Truck,
   Award,
@@ -43,6 +44,7 @@ import { BlogList } from "./components/blog/BlogList";
 import { BlogPost } from "./components/blog/BlogPost";
 import { PackageQuickView } from "./components/PackageQuickView";
 import { AIChatBot } from "./components/chat/AIChatBot";
+import { SearchResults } from "./components/SearchResults";
 import AdminDashboard from "./components/AdminDashboard";
 import { Product, PackageData } from "./types";
 
@@ -58,7 +60,7 @@ interface Consultation {
 }
 
 export default function App() {
-  const [activeTab, setActiveTab] = useState<"home" | "about" | "products" | "recommended" | "combo" | "consultation" | "history" | "product-detail" | "admin" | "blog" | "blog-post">("home");
+  const [activeTab, setActiveTab] = useState<"home" | "about" | "products" | "recommended" | "combo" | "consultation" | "history" | "product-detail" | "admin" | "blog" | "blog-post" | "search">("home");
   const [previousTab, setPreviousTab] = useState<typeof activeTab>("home");
 
   const navigateTo = (tab: typeof activeTab) => {
@@ -102,6 +104,8 @@ export default function App() {
   };
   const [viewingProduct, setViewingProduct] = useState<Product | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
+  const [isSearchVisible, setIsSearchVisible] = useState(false);
+  const [isMoreMenuOpen, setIsMoreMenuOpen] = useState(false);
   const [zoomPos, setZoomPos] = useState({ x: 0, y: 0 });
   const [isZoomed, setIsZoomed] = useState(false);
 
@@ -340,8 +344,8 @@ export default function App() {
 
         {/* Header */}
         <header className="bg-white border-b border-slate-200">
-          <div className="max-w-7xl mx-auto px-4 h-16 md:h-20 flex items-center justify-between">
-            <div className="flex items-center gap-2 md:gap-3">
+          <div className="max-w-7xl mx-auto px-4 h-16 md:h-20 flex items-center justify-between gap-4">
+            <div className="flex items-center gap-2 md:gap-3 flex-shrink-0">
               {CONFIG.company.logoUrl ? (
                 <img 
                   src={CONFIG.company.logoUrl} 
@@ -362,34 +366,122 @@ export default function App() {
             </div>
 
             {/* Desktop Navigation */}
-            <nav className="hidden lg:flex items-center gap-8">
-              {CONFIG.navigation.map((item) => {
+            <nav className="hidden lg:flex items-center justify-center gap-4 xl:gap-6 flex-1 px-4">
+              {CONFIG.navigation.filter(item => ["home", "products", "recommended", "combo", "blog"].includes(item.id)).map((item) => {
                 const Icon = item.id === "home" ? HomeIcon :
                              item.id === "products" ? ShoppingBag : 
-                             item.id === "consultation" ? Stethoscope : 
-                             item.id === "history" ? History :
+                             item.id === "recommended" ? LayoutGrid :
                              item.id === "combo" ? Package :
-                             item.id === "blog" ? FileText :
-                             item.id === "admin" ? DbIcon : User;
+                             item.id === "blog" ? FileText : HomeIcon;
                 return (
                   <button
                     key={item.id}
                     onClick={() => navigateTo(item.id as any)}
-                    className={`flex items-center gap-2 text-sm font-medium transition-colors ${
-                      activeTab === item.id ? "text-emerald-600" : "text-slate-500 hover:text-emerald-500"
+                    className={`flex items-center gap-1.5 xl:gap-2 text-xs xl:text-sm font-bold transition-all whitespace-nowrap py-2 px-1 border-b-2 ${
+                      activeTab === item.id 
+                        ? "text-emerald-600 border-emerald-600" 
+                        : "text-slate-500 border-transparent hover:text-emerald-500 hover:border-emerald-200"
                     }`}
                   >
-                    <Icon size={18} />
+                    <Icon size={16} className="xl:w-[18px] xl:h-[18px]" />
                     {item.label}
                   </button>
                 );
               })}
+
+              {/* More Menu */}
+              <div className="relative">
+                <button
+                  onClick={() => setIsMoreMenuOpen(!isMoreMenuOpen)}
+                  className={`flex items-center gap-1.5 xl:gap-2 text-xs xl:text-sm font-bold transition-all whitespace-nowrap py-2 px-1 border-b-2 ${
+                    ["about", "consultation", "history", "admin"].includes(activeTab)
+                      ? "text-emerald-600 border-emerald-600"
+                      : "text-slate-500 border-transparent hover:text-emerald-500 hover:border-emerald-200"
+                  }`}
+                >
+                  More <ChevronRight size={16} className={`transition-transform ${isMoreMenuOpen ? 'rotate-90' : ''}`} />
+                </button>
+
+                <AnimatePresence>
+                  {isMoreMenuOpen && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: 10 }}
+                      className="absolute top-full right-0 mt-2 w-48 bg-white rounded-2xl shadow-2xl border border-slate-100 py-2 z-50"
+                    >
+                      {CONFIG.navigation.filter(item => !["home", "products", "recommended", "combo", "blog"].includes(item.id)).map((item) => {
+                        const Icon = item.id === "about" ? Info :
+                                     item.id === "consultation" ? Stethoscope : 
+                                     item.id === "history" ? History :
+                                     item.id === "admin" ? DbIcon : User;
+                        return (
+                          <button
+                            key={item.id}
+                            onClick={() => {
+                              navigateTo(item.id as any);
+                              setIsMoreMenuOpen(false);
+                            }}
+                            className={`flex items-center gap-3 w-full px-4 py-3 text-sm font-bold transition-all ${
+                              activeTab === item.id 
+                                ? "text-emerald-600 bg-emerald-50" 
+                                : "text-slate-600 hover:bg-slate-50 hover:text-emerald-500"
+                            }`}
+                          >
+                            <Icon size={16} />
+                            {item.label}
+                          </button>
+                        );
+                      })}
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
             </nav>
 
-            <div className="flex items-center gap-2 md:gap-4">
-              <button className="p-2 text-slate-400 hover:text-emerald-500 transition-colors hidden sm:block">
-                <Search size={20} />
-              </button>
+            <div className="flex items-center gap-2 md:gap-4 flex-shrink-0">
+              <div className={`flex items-center transition-all duration-300 ${isSearchVisible ? 'w-40 md:w-64' : 'w-10'}`}>
+                <AnimatePresence mode="wait">
+                  {isSearchVisible ? (
+                    <motion.div 
+                      initial={{ width: 0, opacity: 0 }}
+                      animate={{ width: "100%", opacity: 1 }}
+                      exit={{ width: 0, opacity: 0 }}
+                      className="relative flex items-center w-full"
+                    >
+                      <input 
+                        autoFocus
+                        type="text"
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter' && searchQuery.trim()) {
+                            navigateTo('search');
+                            setIsSearchVisible(false);
+                          }
+                        }}
+                        placeholder="Search health..."
+                        className="w-full bg-slate-100 border-none rounded-full px-4 py-2 text-sm focus:ring-2 focus:ring-emerald-200 outline-none"
+                      />
+                      <button 
+                        onClick={() => setIsSearchVisible(false)}
+                        className="absolute right-2 p-1 text-slate-400 hover:text-slate-600"
+                      >
+                        <X size={16} />
+                      </button>
+                    </motion.div>
+                  ) : (
+                    <motion.button 
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      onClick={() => setIsSearchVisible(true)}
+                      className="p-2 text-slate-400 hover:text-emerald-500 transition-colors"
+                    >
+                      <Search size={20} />
+                    </motion.button>
+                  )}
+                </AnimatePresence>
+              </div>
               <div className="hidden sm:block h-8 w-[1px] bg-slate-200 mx-1 md:mx-2"></div>
               <div className="hidden xs:flex items-center gap-1.5 md:gap-2 px-2 md:px-3 py-1 md:py-1.5 bg-emerald-50 text-emerald-700 rounded-full text-[10px] md:text-xs font-bold border border-emerald-100">
                 <ShieldCheck size={12} className="md:hidden" />
@@ -417,6 +509,26 @@ export default function App() {
                 className="lg:hidden bg-white border-t border-slate-100 overflow-hidden"
               >
                 <div className="px-4 py-6 space-y-4">
+                  {/* Mobile Search */}
+                  <div className="pb-2">
+                    <div className="relative flex items-center">
+                      <Search className="absolute left-4 text-slate-400" size={18} />
+                      <input 
+                        type="text"
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter' && searchQuery.trim()) {
+                            navigateTo('search');
+                            setIsMobileMenuOpen(false);
+                          }
+                        }}
+                        placeholder="Search products, symptoms..."
+                        className="w-full bg-slate-100 border-none rounded-2xl pl-12 pr-4 py-3 text-sm focus:ring-2 focus:ring-emerald-200 outline-none font-bold"
+                      />
+                    </div>
+                  </div>
+
                   {CONFIG.navigation.map((item) => {
                     const Icon = item.id === "home" ? HomeIcon :
                                  item.id === "products" ? ShoppingBag : 
@@ -451,13 +563,36 @@ export default function App() {
       </div>
 
       <main className={`mx-auto transition-all duration-500 ${
-        activeTab === "home" || activeTab === "about"
+        activeTab === "home" || activeTab === "about" || activeTab === "search"
           ? "max-w-none px-0 py-0" 
           : activeTab === "combo" 
             ? "max-w-[1440px] px-4 py-8 md:py-12" 
             : "max-w-7xl px-4 py-8 md:py-12"
       }`}>
         <AnimatePresence mode="wait">
+          {activeTab === "search" && (
+            <motion.div
+              key="search"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              className="pt-20"
+            >
+              <SearchResults 
+                query={searchQuery}
+                products={products}
+                recommendedPackages={recommendedPackages}
+                comboPackages={comboPackages}
+                onClose={() => navigateTo("home")}
+                onViewProduct={(p) => {
+                  setViewingProduct(p);
+                  navigateTo("product-detail");
+                }}
+                onOrderProduct={(p) => openOrderDrawer(p, "product")}
+                onOrderPackage={(pkg) => openOrderDrawer(pkg, "package")}
+              />
+            </motion.div>
+          )}
           {activeTab === "home" && (
             <motion.div
               key="home"
