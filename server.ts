@@ -4,6 +4,7 @@ import { fileURLToPath } from "url";
 import { getSupabaseAdmin } from "./src/services/supabaseAdmin.js";
 import { NotificationService } from "./src/services/notificationService.js";
 import { getAIService } from "./src/services/ai/AIService.js";
+import { CONFIG } from "./src/config.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -45,25 +46,59 @@ export async function createServer() {
         }
         
         // Fetch package_products to know what's inside the packages
-        const { data: packageProducts } = await supabase.from('package_products').select('package_id, product_id, quantity, products(name)');
+        const { data: packageProducts, error: ppErr } = await supabase.from('package_products').select('package_id, product_id, quantity, products(name)');
         
+        if (prodErr || packErr) {
+          console.error("Database fetch error during AI context generation:", { prodErr, packErr });
+          // If we have a cache, keep using it even if stale, otherwise we return empty
+          if (globalProductCache) return globalProductCache;
+        }
+
+        // Fetch blog posts for context
+        const { data: blogs } = await supabase.from('blogs').select('title, excerpt').limit(5);
+
         let context = "";
         
+        // Add Company Info
+        context += "--- COMPANY INFORMATION ---\n";
+        context += `Name: ${CONFIG.company.name}\n`;
+        context += `Description: GHT Healthcare is a leading provider of natural health supplements and wellness solutions in Nigeria. We specialize in traditional herbal medicine combined with modern science.\n`;
+        context += `WhatsApp: ${CONFIG.company.phone}\n\n`;
+
+        if (blogs && blogs.length > 0) {
+          context += "--- RECENT BLOG POSTS ---\n";
+          context += blogs.map(b => `- ${b.title}: ${b.excerpt}`).join('\n') + "\n\n";
+        }
+
         if (products && products.length > 0) {
-          context += "--- INDIVIDUAL PRODUCTS (JSON FORMAT) ---\n";
+          context += "--- PRODUCTS ---\n";
           context += products.map((p: any) => {
-            // Remove huge image URLs to save AI tokens, keep everything else
-            const { image_url, ...rest } = p;
-            return JSON.stringify(rest);
+            // Only keep essential fields to save tokens and speed up response
+            const essential = {
+              id: p.id,
+              name: p.name,
+              price: p.price_naira,
+              desc: p.short_desc,
+              benefits: p.health_benefits,
+              usage: p.usage_instructions
+            };
+            return JSON.stringify(essential);
           }).join('\n');
         }
         
         if (packages && packages.length > 0) {
-          context += "\n\n--- RECOMMENDED & COMBO PACKAGES (JSON FORMAT) ---\n";
+          context += "\n--- PACKAGES ---\n";
           context += packages.map((pkg: any) => {
-            const { image_url, ...rest } = pkg;
-            // Ensure is_combo is present even if column missing in DB
-            const is_combo = pkg.is_combo || false;
+            // Only keep essential fields
+            const essential = {
+              id: pkg.id,
+              name: pkg.name,
+              price: pkg.price,
+              desc: pkg.description,
+              benefits: pkg.health_benefits,
+              symptoms: pkg.symptoms,
+              is_combo: pkg.is_combo || false
+            };
             
             // Find products in this package
             const included = packageProducts 
@@ -72,7 +107,7 @@ export async function createServer() {
                   .join(', ')
               : 'N/A';
               
-            return JSON.stringify({ ...rest, is_combo, included_products: included });
+            return JSON.stringify({ ...essential, included });
           }).join('\n');
         }
         
@@ -780,10 +815,12 @@ export async function createServer() {
   return app;
 }
 
-// Only start the server if this file is run directly
-const isMainModule = fileURLToPath(import.meta.url) === process.argv[1];
-if (isMainModule && !process.env.VERCEL) {
-  createServer().then(app => {
-    app.listen(3000, "0.0.0.0", () => console.log("Server running on http://localhost:3000"));
+// Start the server
+const PORT = 3000;
+createServer().then(app => {
+  app.listen(PORT, "0.0.0.0", () => {
+    console.log(`Server running on http://localhost:${PORT}`);
   });
-}
+}).catch(err => {
+  console.error("Failed to start server:", err);
+});

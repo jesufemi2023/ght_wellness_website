@@ -89,28 +89,50 @@ export const AIChatBot: React.FC<AIChatBotProps> = ({ onProductClick, isOpen, se
     setIsLoading(true);
 
     try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 15000); // 15s timeout
+
       const res = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: userMsg.content })
+        body: JSON.stringify({ message: userMsg.content }),
+        signal: controller.signal
       });
 
-      const data = await res.json();
+      clearTimeout(timeoutId);
 
-      if (!res.ok) throw new Error(data.error || 'Failed to get response');
+      const contentType = res.headers.get("content-type");
+      if (contentType && contentType.includes("application/json")) {
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Failed to get response');
 
-      const aiMsg: ChatMessage = {
-        id: (Date.now() + 1).toString(),
-        role: 'ai',
-        content: data.reply
-      };
-
-      setMessages(prev => [...prev, aiMsg]);
+        const aiMsg: ChatMessage = {
+          id: (Date.now() + 1).toString(),
+          role: 'ai',
+          content: data.reply
+        };
+        setMessages(prev => [...prev, aiMsg]);
+      } else {
+        // Handle non-JSON response (likely a Vercel timeout or error page)
+        const status = res.status;
+        if (status === 504 || status === 503 || status === 502 || status === 500) {
+          throw new Error("The AI is taking a bit longer than usual to think or the server is busy. Please try again in a moment.");
+        }
+        throw new Error(`Connection issue (Status: ${status}). Please check your internet or try again later.`);
+      }
     } catch (error: any) {
+      let friendlyMessage = error.message || "I'm sorry, I encountered an error. Please try again later.";
+      
+      if (error.name === 'AbortError') {
+        friendlyMessage = "Request timed out. The AI is experiencing high demand. Please try a shorter question.";
+      } else if (friendlyMessage.includes('Unexpected token') || friendlyMessage.includes('doctype')) {
+        friendlyMessage = "The server is currently busy or experiencing a timeout. Please try again in a few seconds.";
+      }
+
       const errorMsg: ChatMessage = {
         id: (Date.now() + 1).toString(),
         role: 'ai',
-        content: error.message || "I'm sorry, I encountered an error. Please try again later."
+        content: friendlyMessage
       };
       setMessages(prev => [...prev, errorMsg]);
     } finally {

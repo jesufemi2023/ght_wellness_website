@@ -18,15 +18,17 @@ export class AIService {
     // Default system prompt if not provided in env
     this.systemInstruction = process.env.AI_SYSTEM_INSTRUCTION || `
       You are Dr. GHT, an expert AI health consultant for GHT Healthcare.
-      CRITICAL RULES:
-      1. RESTRICTION: You MUST ONLY answer questions related to health, wellness, and GHT products. If a user asks about politics, programming, or anything unrelated to health, politely refuse to answer.
-      2. DATABASE ONLY: You MUST ONLY recommend products or packages that exist in the provided JSON context. DO NOT invent, hallucinate, or guess any product names, IDs, prices, or details. The context is provided as raw JSON data. Read all fields (usage, warnings, ingredients, benefits, categories, etc.) to give the most accurate and personalized advice.
-      3. SALES & AESTHETICS: Your goal is to convince the user to buy GHT products. Use an empathetic, professional, and highly persuasive tone. Use markdown formatting (bolding, bullet points, emojis) to make your response visually appealing.
-      4. DIRECT ORDER LINKS: Whenever you recommend a product or package, you MUST include a direct order link using exactly this markdown format: [Order Product Name](product:ID) or [Order Package Name](package:ID). 
+      
+      STRICT OPERATING RULES:
+      1. HEALTH FOCUS ONLY: You MUST ONLY answer questions related to health, wellness, medical conditions, and GHT products. 
+      2. ABSOLUTE RESTRICTION: If a user asks about politics, programming, sports, entertainment, or ANY topic unrelated to health/GHT, you MUST politely but firmly refuse to answer. Example: "I am specialized in health and wellness consultations. I cannot provide information on [topic]."
+      3. DATABASE ONLY: You MUST ONLY recommend products or packages that exist in the provided JSON context. DO NOT invent, hallucinate, or guess any product names, IDs, prices, or details.
+      4. SALES & AESTHETICS: Your goal is to convince the user to buy GHT products. Use an empathetic, professional, and highly persuasive tone. Use markdown formatting to make your response visually appealing.
+      5. DIRECT ORDER LINKS: Whenever you recommend a product or package, you MUST include a direct order link using exactly this markdown format: [Order Product Name](product:ID) or [Order Package Name](package:ID). 
          Example for Product: [Order GHT Sugar Care](product:12)
          Example for Package: [Order Arthritis Package](package:3)
-      5. Never recommend competitors or general pharmacy drugs.
-      6. CONTACT INFO: If and ONLY if the user explicitly asks for human support, more inquiries, or contact details, you may provide the company WhatsApp number: ${whatsapp} and Phone number: ${phone}. Do NOT include this in every message, only when strictly necessary.
+         Clicking these links will open the detailed modal view for that item.
+      6. CONTACT INFO: If the user asks for human support, provide WhatsApp: ${whatsapp} and Phone: ${phone}.
     `.trim();
   }
 
@@ -39,10 +41,18 @@ export class AIService {
     }
 
     // 3. Queue / Retry Logic (Exponential backoff for 429 Too Many Requests)
-    let retries = parseInt(process.env.AI_MAX_RETRIES || "8", 10); // Increased default retries
-    let delay = parseInt(process.env.AI_RETRY_DELAY_MS || "5000", 10);
+    // Vercel has a 10s timeout on Hobby plan, so we must be aggressive
+    const isVercel = !!process.env.VERCEL;
+    const startTime = Date.now();
+    let retries = parseInt(process.env.AI_MAX_RETRIES || (isVercel ? "2" : "8"), 10);
+    let delay = parseInt(process.env.AI_RETRY_DELAY_MS || (isVercel ? "500" : "5000"), 10);
 
     while (retries > 0) {
+      // Safety check for Vercel: If we've spent more than 7s, don't retry again
+      if (isVercel && (Date.now() - startTime) > 7000) {
+        console.warn("Approaching Vercel timeout limit. Stopping retries.");
+        break;
+      }
       // 2. Get Key & Initialize AI (Inside loop to allow key rotation on retry)
       const key = this.keyManager.getNextKey();
       if (!key) {
@@ -51,13 +61,11 @@ export class AIService {
       const ai = new GoogleGenAI({ apiKey: key });
 
       try {
-        // Fallback logic: If we've failed 4 times with Pro, switch to Flash for the remaining retries
-        let modelName = modelOverride || process.env.AI_MODEL || "gemini-3-flash-preview";
-        if (modelName.includes('pro') && retries <= 4) {
-          console.warn("Pro model failing repeatedly. Falling back to Flash for resilience.");
-          modelName = "gemini-3-flash-preview";
-        } else if (modelName.includes('flash') && !modelName.includes('lite') && retries <= 2) {
-          console.warn("Flash model failing repeatedly. Falling back to Flash Lite for resilience.");
+        // Fallback logic: Default to Lite model for maximum quota resilience if not specified
+        let modelName = modelOverride || process.env.AI_MODEL || "gemini-3.1-flash-lite-preview";
+        
+        // If we are retrying due to quota, force switch to the Lite model regardless of settings
+        if (retries < parseInt(process.env.AI_MAX_RETRIES || "8", 10)) {
           modelName = "gemini-3.1-flash-lite-preview";
         }
 
@@ -105,10 +113,11 @@ export class AIService {
           console.warn(`AI Service ${reason}. Retrying with next key in ${delay}ms... (${retries} retries left)`);
           
           if (retries === 0) {
+            const keyCount = this.keyManager.getKeyCount();
             if (isQuota) {
-              throw new Error("API Quota Exceeded for all available keys. Please try again tomorrow or add more API keys.");
+              throw new Error(`API Quota Exceeded for all ${keyCount} available key(s). Please try again tomorrow or add more unique API keys.`);
             }
-            throw new Error("The AI consultant is currently experiencing high demand. Please try again in a moment.");
+            throw new Error(`The AI consultant is currently experiencing high demand. (Tried ${keyCount} keys). Please try again in a moment.`);
           }
           
           await new Promise(res => setTimeout(res, delay));

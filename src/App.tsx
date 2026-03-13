@@ -41,6 +41,7 @@ import { ComboCard } from "./components/ComboCard";
 import { OrderDrawer } from "./components/OrderDrawer";
 import { BlogList } from "./components/blog/BlogList";
 import { BlogPost } from "./components/blog/BlogPost";
+import { PackageQuickView } from "./components/PackageQuickView";
 import { AIChatBot } from "./components/chat/AIChatBot";
 import AdminDashboard from "./components/AdminDashboard";
 import { Product, PackageData } from "./types";
@@ -75,6 +76,7 @@ export default function App() {
   const [loading, setLoading] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const [selectedPackage, setSelectedPackage] = useState<PackageData | null>(null);
   const [selectedBlogId, setSelectedBlogId] = useState<string | null>(null);
   const [isOrderDrawerOpen, setIsOrderDrawerOpen] = useState(false);
   const [isChatOpen, setIsChatOpen] = useState(false);
@@ -222,24 +224,45 @@ export default function App() {
     e.preventDefault();
     setLoading(true);
     try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 20000); // 20s timeout for consultation
+
       const res = await fetch("/api/consultations", {
         method: "POST",
         headers: { 
           "Content-Type": "application/json",
           "x-access-token": accessToken
         },
-        body: JSON.stringify(formData)
+        body: JSON.stringify(formData),
+        signal: controller.signal
       });
-      const data = await res.json();
-      if (data.error) {
-        alert(`Error: ${data.error}`);
+
+      clearTimeout(timeoutId);
+
+      const contentType = res.headers.get("content-type");
+      if (contentType && contentType.includes("application/json")) {
+        const data = await res.json();
+        if (data.error) {
+          alert(`Error: ${data.error}`);
+        } else {
+          alert(`Consultation Submitted!\n\nExpert Recommendation: ${data.ai_recommendation}`);
+          setFormData({ ...formData, patient_name: "", phone: "", illness: "", symptoms: "" });
+          setActiveTab("history");
+        }
       } else {
-        alert(`Consultation Submitted!\n\nExpert Recommendation: ${data.ai_recommendation}`);
-        setFormData({ ...formData, patient_name: "", phone: "", illness: "", symptoms: "" });
-        setActiveTab("history");
+        const status = res.status;
+        if (status === 504 || status === 503 || status === 502 || status === 500) {
+          alert("The AI expert is taking a long time to analyze your symptoms or the server is busy. Your consultation might still be processing. Please check your history in a minute.");
+        } else {
+          alert(`The server is currently busy (Status: ${status}). Please try again in a few seconds.`);
+        }
       }
-    } catch (e) {
-      alert("Failed to submit consultation. Please check your connection.");
+    } catch (e: any) {
+      if (e.name === 'AbortError') {
+        alert("Request timed out. The AI is experiencing high demand. Please check your history in a moment to see if it processed.");
+      } else {
+        alert("Failed to submit consultation. Please check your connection or try again later.");
+      }
     } finally {
       setLoading(false);
     }
@@ -1376,6 +1399,25 @@ export default function App() {
         )}
       </AnimatePresence>
 
+      {/* Package Quick View Modal */}
+      {selectedPackage && (
+        <PackageQuickView 
+          isOpen={!!selectedPackage}
+          onClose={() => setSelectedPackage(null)}
+          data={selectedPackage}
+          allPackages={recommendedPackages}
+          onOrder={(qty) => {
+            openOrderDrawer(selectedPackage, 'package', qty);
+            setSelectedPackage(null);
+          }}
+          onViewProduct={(product) => {
+            setViewingProduct(product);
+            setSelectedPackage(null);
+            setActiveTab("product-detail");
+          }}
+        />
+      )}
+
       {/* Order Drawer */}
       {orderItem && (
         <OrderDrawer 
@@ -1461,8 +1503,7 @@ export default function App() {
               if (foundType === 'product') {
                 setSelectedProduct(foundItem);
               } else {
-                setOrderItem({ item: foundItem, type: 'package', qty: 1 });
-                setIsOrderDrawerOpen(true);
+                setSelectedPackage(foundItem);
               }
             }, 150);
           } else {
