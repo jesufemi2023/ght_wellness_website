@@ -62,6 +62,7 @@ export const CONFIG = {
   })(),
   navigation: [
     { id: "home", label: "Home" },
+    { id: "about", label: "About Us" },
     { id: "products", label: "Products" },
     { id: "recommended", label: "Recommended" },
     { id: "combo", label: "Combo Packs" },

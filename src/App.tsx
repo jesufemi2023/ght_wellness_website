@@ -34,6 +34,7 @@ import { CONFIG } from "./config";
 import { CacheService } from "./utils/cache";
 
 import { Home } from "./components/Home";
+import { About } from "./components/About";
 import { PackageCard } from "./components/PackageCard";
 import { ProductCard } from "./components/ProductCard";
 import { ComboCard } from "./components/ComboCard";
@@ -56,7 +57,7 @@ interface Consultation {
 }
 
 export default function App() {
-  const [activeTab, setActiveTab] = useState<"home" | "products" | "recommended" | "combo" | "consultation" | "history" | "product-detail" | "admin" | "blog" | "blog-post">("home");
+  const [activeTab, setActiveTab] = useState<"home" | "about" | "products" | "recommended" | "combo" | "consultation" | "history" | "product-detail" | "admin" | "blog" | "blog-post">("home");
   const [previousTab, setPreviousTab] = useState<typeof activeTab>("home");
 
   const navigateTo = (tab: typeof activeTab) => {
@@ -427,7 +428,7 @@ export default function App() {
       </div>
 
       <main className={`mx-auto transition-all duration-500 ${
-        activeTab === "home" 
+        activeTab === "home" || activeTab === "about"
           ? "max-w-none px-0 py-0" 
           : activeTab === "combo" 
             ? "max-w-[1440px] px-4 py-8 md:py-12" 
@@ -459,6 +460,17 @@ export default function App() {
                 }}
                 onOpenChat={() => setIsChatOpen(true)}
               />
+            </motion.div>
+          )}
+
+          {activeTab === "about" && (
+            <motion.div
+              key="about"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+            >
+              <About />
             </motion.div>
           )}
 
