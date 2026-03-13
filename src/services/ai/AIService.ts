@@ -90,11 +90,8 @@ export class AIService {
         const errStatus = error.status || error.error?.status || error.error?.code;
         
         const isQuota = errStr.includes('quota') || errMsg.includes('quota') || errStr.includes('exhausted') || errMsg.includes('exhausted');
-        if (isQuota) {
-          throw new Error("API Quota Exceeded. You have reached the free tier limit for the Gemini API. Please try again tomorrow or use a different API key.");
-        }
-
-        const isRetryable = errStatus === 429 || errStatus === 503 || 
+        
+        const isRetryable = isQuota || errStatus === 429 || errStatus === 503 || 
                             errStatus === 'UNAVAILABLE' ||
                             errStr.includes('429') || errStr.includes('503') ||
                             errStr.includes('unavailable') || errStr.includes('high demand') ||
@@ -104,9 +101,13 @@ export class AIService {
                             
         if (isRetryable) {
           retries--;
-          console.warn(`AI Service Busy (${errStatus || 'Unknown'}). Retrying with next key in ${delay}ms... (${retries} retries left)`);
+          const reason = isQuota ? "Quota Exceeded" : (errStatus || 'Busy');
+          console.warn(`AI Service ${reason}. Retrying with next key in ${delay}ms... (${retries} retries left)`);
           
           if (retries === 0) {
+            if (isQuota) {
+              throw new Error("API Quota Exceeded for all available keys. Please try again tomorrow or add more API keys.");
+            }
             throw new Error("The AI consultant is currently experiencing high demand. Please try again in a moment.");
           }
           
