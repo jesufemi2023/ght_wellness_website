@@ -577,7 +577,7 @@ export async function createServer() {
         }
       `;
 
-      const response = await getAIService().generateResponse(prompt, productContext, "gemini-3-flash-preview", "application/json");
+      const response = await getAIService().generateResponse(prompt, productContext, undefined, "application/json");
       try {
         const jsonStr = response.replace(/```json\n?|\n?```/g, '').trim();
         const result = JSON.parse(jsonStr);
