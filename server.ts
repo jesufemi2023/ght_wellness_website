@@ -795,11 +795,16 @@ export async function createServer() {
       if (oiError) console.error("Order Items Error:", oiError);
     }
 
-    // 4. Send Notifications (Fire and Forget)
-    NotificationService.sendOrderNotification(
-      { ...order, full_name, phone_number, delivery_address, landmark, payment_method, payment_receipt_url }, 
-      items || []
-    ).catch(err => console.error("Notification Error:", err));
+    // 4. Send Notifications (Wait for completion on Vercel)
+    try {
+      await NotificationService.sendOrderNotification(
+        { ...order, full_name, phone_number, delivery_address, landmark, payment_method, payment_receipt_url }, 
+        items || []
+      );
+      console.log("✅ Notifications sent successfully.");
+    } catch (err) {
+      console.error("❌ Notification Error:", err);
+    }
 
     res.json(order);
   });
