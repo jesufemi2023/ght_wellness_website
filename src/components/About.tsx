@@ -12,7 +12,11 @@ import {
   ArrowRight
 } from 'lucide-react';
 
-export const About: React.FC = () => {
+interface AboutProps {
+  onNavigate?: (tab: "home" | "about" | "products" | "recommended" | "combo" | "consultation" | "history" | "product-detail" | "admin" | "blog" | "blog-post" | "search") => void;
+}
+
+export const About: React.FC<AboutProps> = ({ onNavigate }) => {
   return (
     <div className="bg-white">
       {/* 1. Hero Section - Shopify Style Editorial */}
@@ -31,6 +35,22 @@ export const About: React.FC = () => {
               <p className="text-xl md:text-3xl text-slate-600 font-medium leading-relaxed max-w-2xl">
                 We are a leading distributor and marketer of professional health products committed to improving the well-being of our community.
               </p>
+              <div className="mt-12 flex flex-col sm:flex-row gap-6">
+                <button 
+                  type="button"
+                  onClick={() => onNavigate?.("products")}
+                  className="cursor-pointer w-full sm:w-auto bg-emerald-600 text-white px-10 py-5 rounded-2xl font-black text-lg hover:bg-emerald-700 transition-all flex items-center justify-center gap-3 shadow-xl shadow-emerald-100"
+                >
+                  Explore Products <ArrowRight size={20} />
+                </button>
+                <button 
+                  type="button"
+                  onClick={() => onNavigate?.("consultation")}
+                  className="cursor-pointer w-full sm:w-auto bg-white border-2 border-slate-200 text-slate-900 px-10 py-5 rounded-2xl font-black text-lg hover:bg-slate-50 transition-all"
+                >
+                  Contact Us
+                </button>
+              </div>
             </motion.div>
           </div>
         </div>
@@ -214,10 +234,18 @@ export const About: React.FC = () => {
               We are passionate about providing trusted wellness solutions to improve the quality of life and promote healthier communities.
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-6">
-              <button className="w-full sm:w-auto bg-slate-900 text-white px-10 py-5 rounded-2xl font-black text-lg hover:bg-slate-800 transition-all flex items-center justify-center gap-3">
+              <button 
+                type="button"
+                onClick={() => onNavigate?.("products")}
+                className="cursor-pointer w-full sm:w-auto bg-slate-900 text-white px-10 py-5 rounded-2xl font-black text-lg hover:bg-slate-800 transition-all flex items-center justify-center gap-3"
+              >
                 Explore Products <ArrowRight size={20} />
               </button>
-              <button className="w-full sm:w-auto bg-white border-2 border-slate-200 text-slate-900 px-10 py-5 rounded-2xl font-black text-lg hover:bg-slate-50 transition-all">
+              <button 
+                type="button"
+                onClick={() => onNavigate?.("consultation")}
+                className="cursor-pointer w-full sm:w-auto bg-white border-2 border-slate-200 text-slate-900 px-10 py-5 rounded-2xl font-black text-lg hover:bg-slate-50 transition-all"
+              >
                 Contact Us
               </button>
             </div>
