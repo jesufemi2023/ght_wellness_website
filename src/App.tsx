@@ -251,7 +251,7 @@ export default function App() {
         } else {
           alert(`Consultation Submitted!\n\nExpert Recommendation: ${data.ai_recommendation}`);
           setFormData({ ...formData, patient_name: "", phone: "", illness: "", symptoms: "" });
-          setActiveTab("history");
+          navigateTo("history");
         }
       } else {
         const status = res.status;
@@ -367,8 +367,9 @@ export default function App() {
 
             {/* Desktop Navigation */}
             <nav className="hidden lg:flex items-center justify-center gap-4 xl:gap-6 flex-1 px-4">
-              {CONFIG.navigation.filter(item => ["home", "products", "recommended", "combo", "blog"].includes(item.id)).map((item) => {
+              {CONFIG.navigation.filter(item => ["home", "about", "products", "recommended", "combo", "blog"].includes(item.id)).map((item) => {
                 const Icon = item.id === "home" ? HomeIcon :
+                             item.id === "about" ? Info :
                              item.id === "products" ? ShoppingBag : 
                              item.id === "recommended" ? LayoutGrid :
                              item.id === "combo" ? Package :
@@ -394,7 +395,7 @@ export default function App() {
                 <button
                   onClick={() => setIsMoreMenuOpen(!isMoreMenuOpen)}
                   className={`flex items-center gap-1.5 xl:gap-2 text-xs xl:text-sm font-bold transition-all whitespace-nowrap py-2 px-1 border-b-2 ${
-                    ["about", "consultation", "history", "admin"].includes(activeTab)
+                    ["consultation", "history", "admin"].includes(activeTab)
                       ? "text-emerald-600 border-emerald-600"
                       : "text-slate-500 border-transparent hover:text-emerald-500 hover:border-emerald-200"
                   }`}
@@ -410,7 +411,7 @@ export default function App() {
                       exit={{ opacity: 0, y: 10 }}
                       className="absolute top-full right-0 mt-2 w-48 bg-white rounded-2xl shadow-2xl border border-slate-100 py-2 z-50"
                     >
-                      {CONFIG.navigation.filter(item => !["home", "products", "recommended", "combo", "blog"].includes(item.id)).map((item) => {
+                      {CONFIG.navigation.filter(item => !["home", "about", "products", "recommended", "combo", "blog"].includes(item.id)).map((item) => {
                         const Icon = item.id === "about" ? Info :
                                      item.id === "consultation" ? Stethoscope : 
                                      item.id === "history" ? History :
@@ -531,6 +532,7 @@ export default function App() {
 
                   {CONFIG.navigation.map((item) => {
                     const Icon = item.id === "home" ? HomeIcon :
+                                 item.id === "about" ? Info :
                                  item.id === "products" ? ShoppingBag : 
                                  item.id === "consultation" ? Stethoscope : 
                                  item.id === "history" ? History :
@@ -736,8 +738,7 @@ export default function App() {
                     onOrder={() => openOrderDrawer(pkg, 'package')}
                     onViewProduct={(product) => {
                       setViewingProduct(product);
-                      setActiveTab("product-detail");
-                      window.scrollTo({ top: 0, behavior: 'smooth' });
+                      navigateTo("product-detail");
                     }}
                   />
                 ))}
@@ -788,8 +789,7 @@ export default function App() {
                     onOrder={openOrderDrawer}
                     onProductClick={(product) => {
                       setViewingProduct(product);
-                      setActiveTab("product-detail");
-                      window.scrollTo({ top: 0, behavior: 'smooth' });
+                      navigateTo("product-detail");
                     }}
                   />
                 ))}
@@ -1029,7 +1029,7 @@ export default function App() {
                       Speak with a professional health consultant about this product.
                     </p>
                     <button 
-                      onClick={() => setActiveTab("consultation")}
+                      onClick={() => navigateTo("consultation")}
                       className="w-full bg-white text-emerald-700 py-4 rounded-2xl font-black hover:bg-emerald-50 transition-colors"
                     >
                       Free Consultation
@@ -1044,7 +1044,7 @@ export default function App() {
           <BlogList 
             onSelectPost={(id) => {
               setSelectedBlogId(id);
-              setActiveTab("blog-post");
+              navigateTo("blog-post");
             }} 
           />
         )}
@@ -1052,7 +1052,7 @@ export default function App() {
         {activeTab === "blog-post" && selectedBlogId && (
           <BlogPost 
             id={selectedBlogId} 
-            onBack={() => setActiveTab("blog")} 
+            onBack={() => navigateTo("blog")} 
             onOrderPackage={(pkg) => openOrderDrawer(pkg, 'package')}
           />
         )}
@@ -1344,7 +1344,7 @@ export default function App() {
             <ul className="space-y-3 md:space-y-4 text-slate-400 text-xs md:text-sm">
               {CONFIG.navigation.map(item => (
                 <li key={item.id}>
-                  <button onClick={() => setActiveTab(item.id as any)} className="hover:text-emerald-400 transition-colors">
+                  <button onClick={() => navigateTo(item.id as any)} className="hover:text-emerald-400 transition-colors">
                     {item.label}
                   </button>
                 </li>
@@ -1509,7 +1509,7 @@ export default function App() {
                       onClick={() => {
                         setViewingProduct(selectedProduct);
                         setSelectedProduct(null);
-                        setActiveTab("product-detail");
+                        navigateTo("product-detail");
                       }}
                       className="w-full bg-white text-emerald-600 border-2 border-emerald-600 py-3 md:py-4 rounded-2xl font-black text-base md:text-lg hover:bg-emerald-50 transition-all flex items-center justify-center gap-2"
                     >
@@ -1548,7 +1548,7 @@ export default function App() {
           onViewProduct={(product) => {
             setViewingProduct(product);
             setSelectedPackage(null);
-            setActiveTab("product-detail");
+            navigateTo("product-detail");
           }}
         />
       )}

@@ -261,12 +261,13 @@ export default function AdminDashboard({ adminPassword }: AdminDashboardProps) {
 
     // Restore the original API Key Selection workflow
     const aistudio = (window as any).aistudio;
+    let hasUserKey = false;
     if (aistudio) {
       try {
-        const hasKey = await aistudio.hasSelectedApiKey();
-        if (!hasKey) {
-          await aistudio.openSelectKey();
-          return; // Wait for user to select key and click again
+        hasUserKey = await aistudio.hasSelectedApiKey();
+        if (!hasUserKey && editForm.product_ids?.length > 0) {
+          // If they haven't selected a key, we can still try with the default one,
+          // but we should warn them if it fails later.
         }
       } catch (e) {
         console.warn("API Key selection error:", e);
@@ -315,9 +316,11 @@ export default function AdminDashboard({ adminPassword }: AdminDashboardProps) {
 
       parts.push({ text: `Generate a professional studio photograph of a premium wellness combo package named "${editForm.name || 'Wellness Kit'}". It should look like a cohesive "Master Kit" or "Luxury Collection". The kit contains ${editForm.product_ids.length} products in total. Use the provided product images as visual references for the branding, bottle shapes, and label styles. Arrange them elegantly with soft lighting and emerald green accents.` });
 
-      // Using gemini-2.5-flash-image as it works with free keys and is the default choice
+      // Use gemini-3.1-flash-image-preview if user has selected a key, otherwise fallback to 2.5
+      const modelName = hasUserKey ? "gemini-3.1-flash-image-preview" : "gemini-2.5-flash-image";
+
       const response = await ai.models.generateContent({
-        model: "gemini-2.5-flash-image",
+        model: modelName,
         contents: { parts },
         config: {
           imageConfig: {
@@ -343,13 +346,20 @@ export default function AdminDashboard({ adminPassword }: AdminDashboardProps) {
       }
     } catch (e: any) {
       console.error("Image generation error:", e);
-      if (e.message?.includes("permission") || e.message?.includes("403")) {
-        alert("Permission Denied: Your free API key might not have access to this model or the project is not set up for image generation. Please ensure you have selected a valid key.");
-      } else if (e.message?.includes("Requested entity was not found") || e.message?.includes("API key not valid")) {
-        alert("API Key issue. Please select your API key again.");
-        if (aistudio) await aistudio.openSelectKey();
+      const errStr = String(e).toLowerCase();
+      const isQuota = errStr.includes("quota") || errStr.includes("exhausted") || errStr.includes("429");
+      
+      // Fallback to high-quality placeholder if AI fails
+      const fallbackUrl = `https://images.unsplash.com/photo-1584036561566-baf8f5f1b144?q=80&w=1000&auto=format&fit=crop`;
+      setEditForm({ ...editForm, package_image_url: fallbackUrl });
+
+      if (isQuota) {
+        console.warn("AI Quota exceeded, using high-quality fallback image.");
+        // We don't alert here to avoid interrupting the flow, just use the fallback
+      } else if (e.message?.includes("permission") || e.message?.includes("403")) {
+        alert("Permission Denied: Your API key might not have access to this model. Using fallback image.");
       } else {
-        alert(`Error: ${e.message || "Failed to generate image"}`);
+        console.error("Image generation failed, using fallback:", e.message);
       }
     } finally {
       setLoading(false);

@@ -29,11 +29,12 @@ export function BlogAdmin({ onBlogGenerated, adminPassword }: BlogAdminProps) {
 
     // Restore the original API Key Selection workflow
     const aistudio = (window as any).aistudio;
+    let hasUserKey = false;
     if (aistudio) {
       try {
-        const hasKey = await aistudio.hasSelectedApiKey();
-        if (!hasKey) {
-          await aistudio.openSelectKey();
+        hasUserKey = await aistudio.hasSelectedApiKey();
+        if (!hasUserKey) {
+          // We can still try with default key, but will prompt if it fails
         }
       } catch (e) {
         console.warn("API Key selection error:", e);
@@ -108,10 +109,13 @@ export function BlogAdmin({ onBlogGenerated, adminPassword }: BlogAdminProps) {
       }
 
       // 3. Generate Image with AI
-      let image_url = "https://picsum.photos/seed/health/800/600";
+      let image_url = `https://images.unsplash.com/photo-1576091160550-2173dba999ef?q=80&w=800&auto=format&fit=crop`; // High quality medical fallback
       try {
+        // Use gemini-3.1-flash-image-preview if user has selected a key, otherwise fallback to 2.5
+        const imageModel = hasUserKey ? "gemini-3.1-flash-image-preview" : "gemini-2.5-flash-image";
+
         const imageResponse = await ai.models.generateContent({
-          model: "gemini-2.5-flash-image",
+          model: imageModel,
           contents: blogData.image_prompt || `Professional medical photo about ${topic}`,
           config: {
             imageConfig: {
@@ -128,8 +132,16 @@ export function BlogAdmin({ onBlogGenerated, adminPassword }: BlogAdminProps) {
             }
           }
         }
-      } catch (e) {
-        console.error("Failed to generate image:", e);
+      } catch (e: any) {
+        console.error("Failed to generate image, using high-quality fallback:", e);
+        // Use a themed fallback based on category
+        const seeds: Record<string, string> = {
+          'Diabetes': '1584036561566-baf8f5f1b144',
+          'Prostate Health': '1576091160550-2173dba999ef',
+          'Wellness': '1544367567-0f2fcb009e0b'
+        };
+        const photoId = seeds[category] || '1576091160550-2173dba999ef';
+        image_url = `https://images.unsplash.com/photo-${photoId}?q=80&w=800&auto=format&fit=crop`;
       }
 
       // 4. Send to backend to save
@@ -151,9 +163,9 @@ export function BlogAdmin({ onBlogGenerated, adminPassword }: BlogAdminProps) {
       onBlogGenerated();
       alert("Blog generated successfully!");
     } catch (e: any) {
-      if (e.message?.includes("Requested entity was not found") || e.message?.includes("API key not valid") || e.message?.includes("API Key not configured")) {
+      const errStr = String(e).toLowerCase();
+      if (errStr.includes("requested entity was not found") || errStr.includes("api key not valid") || errStr.includes("api key not configured")) {
         alert("API Key issue. Please select your API key again.");
-        const aistudio = (window as any).aistudio;
         if (aistudio) await aistudio.openSelectKey();
       } else {
         alert(e.message);

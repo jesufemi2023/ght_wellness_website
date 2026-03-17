@@ -361,6 +361,61 @@ export function Home({
         </section>
       )}
 
+      {/* About Us Teaser */}
+      <section className="max-w-7xl mx-auto px-6 py-16 md:py-24">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+          <div className="space-y-8">
+            <div className="inline-flex items-center gap-2 px-4 py-2 bg-emerald-50 text-emerald-700 rounded-full text-xs font-black uppercase tracking-widest">
+              <Globe size={16} />
+              Trusted Globally
+            </div>
+            <h2 className="text-4xl md:text-6xl font-black text-slate-900 tracking-tighter leading-tight uppercase">
+              Committed to Your <span className="text-emerald-600">Well-being</span>
+            </h2>
+            <p className="text-xl text-slate-600 font-medium leading-relaxed">
+              As a proud member and distributor of SD GHT Health Care Nigeria Ltd, we work within a global network dedicated to promoting natural wellness and supporting healthier lifestyles.
+            </p>
+            <div className="grid grid-cols-2 gap-6">
+              <div className="space-y-2">
+                <h4 className="text-3xl font-black text-slate-900">100%</h4>
+                <p className="text-sm text-slate-500 font-bold uppercase tracking-wider">Natural Products</p>
+              </div>
+              <div className="space-y-2">
+                <h4 className="text-3xl font-black text-slate-900">Global</h4>
+                <p className="text-sm text-slate-500 font-bold uppercase tracking-wider">Network Support</p>
+              </div>
+            </div>
+            <button 
+              onClick={() => onNavigate('about')}
+              className="group flex items-center gap-3 text-emerald-600 font-black text-xl hover:gap-5 transition-all uppercase tracking-widest"
+            >
+              Learn More About Us <ArrowRight size={24} />
+            </button>
+          </div>
+          <div className="relative">
+            <div className="aspect-square rounded-[3rem] overflow-hidden shadow-2xl">
+              <img 
+                src="https://picsum.photos/seed/healthcare-team/800/800" 
+                alt="Our Team" 
+                className="w-full h-full object-cover"
+                referrerPolicy="no-referrer"
+              />
+            </div>
+            <div className="absolute -bottom-6 -left-6 bg-white p-8 rounded-3xl shadow-xl border border-slate-100 hidden md:block">
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 bg-emerald-600 rounded-xl flex items-center justify-center text-white">
+                  <ShieldCheck size={24} />
+                </div>
+                <div>
+                  <p className="text-sm font-black text-slate-900 uppercase">Trusted Quality</p>
+                  <p className="text-xs text-slate-500 font-bold">Certified Health Solutions</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* 5. Combo Packs - Elderly Accessible Design */}
       {comboPackages.length > 0 && (
         <section className="bg-emerald-950 py-8 md:py-10 rounded-[3rem] mx-4 md:mx-8">
