@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { GoogleGenAI } from "@google/genai";
+import { motion, AnimatePresence } from "motion/react";
 import { 
   Plus, 
   Trash2, 
@@ -21,7 +22,12 @@ import {
   ArrowUpRight,
   LayoutDashboard,
   Box,
-  Layers
+  Layers,
+  Search,
+  Filter,
+  Download,
+  MoreVertical,
+  ChevronRight
 } from "lucide-react";
 import OrdersAdminView from "./OrdersAdminView";
 import ConsultationsAdminView from "./ConsultationsAdminView";
@@ -51,14 +57,17 @@ export default function AdminDashboard({ adminPassword }: AdminDashboardProps) {
     topDistributor: "N/A"
   });
 
-  const tables: { id: TableName; label: string; icon: any }[] = [
-    { id: "overview", label: "Overview", icon: LayoutDashboard },
-    { id: "orders", label: "Orders", icon: ShoppingBag },
-    { id: "consultations", label: "Consultations", icon: ClipboardList },
-    { id: "products", label: "Products", icon: Box },
-    { id: "recommended_packages", label: "Packages", icon: Layers },
-    { id: "blog_posts", label: "Blog Posts", icon: FileText },
-    { id: "profiles", label: "Profiles", icon: Users },
+  const [searchQuery, setSearchQuery] = useState("");
+  const [filterStatus, setFilterStatus] = useState("all");
+
+  const tables: { id: TableName; label: string; icon: any; color: string }[] = [
+    { id: "overview", label: "Overview", icon: LayoutDashboard, color: "bg-blue-500" },
+    { id: "orders", label: "Orders", icon: ShoppingBag, color: "bg-emerald-500" },
+    { id: "consultations", label: "Consultations", icon: ClipboardList, color: "bg-indigo-500" },
+    { id: "products", label: "Products", icon: Box, color: "bg-amber-500" },
+    { id: "recommended_packages", label: "Packages", icon: Layers, color: "bg-purple-500" },
+    { id: "blog_posts", label: "Blog Posts", icon: FileText, color: "bg-pink-500" },
+    { id: "profiles", label: "Profiles", icon: Users, color: "bg-slate-500" },
   ];
 
   useEffect(() => {
@@ -538,9 +547,13 @@ export default function AdminDashboard({ adminPassword }: AdminDashboardProps) {
       `}>
         <div className="p-8 border-b border-slate-100 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="p-2 bg-emerald-600 rounded-xl shadow-lg shadow-emerald-100">
+            <motion.div 
+              initial={{ rotate: -10, scale: 0.9 }}
+              animate={{ rotate: 0, scale: 1 }}
+              className="p-2 bg-emerald-600 rounded-xl shadow-lg shadow-emerald-100"
+            >
               <LockIcon size={20} className="text-white" />
-            </div>
+            </motion.div>
             <div>
               <h1 className="font-black text-lg tracking-tight text-slate-900 leading-none">ADMIN</h1>
               <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">SD GHT Health</p>
@@ -554,7 +567,7 @@ export default function AdminDashboard({ adminPassword }: AdminDashboardProps) {
           </button>
         </div>
 
-        <nav className="flex-1 p-6 space-y-1.5 overflow-y-auto">
+        <nav className="flex-1 p-6 space-y-1.5 overflow-y-auto custom-scrollbar">
           {tables.map(table => (
             <button
               key={table.id}
@@ -564,22 +577,32 @@ export default function AdminDashboard({ adminPassword }: AdminDashboardProps) {
                 setEditingId(null);
                 setSidebarOpen(false);
               }}
-              className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold transition-all duration-200 group ${
+              className={`w-full flex items-center justify-between px-4 py-3 rounded-xl text-sm font-bold transition-all duration-200 group relative ${
                 activeTable === table.id 
-                  ? "bg-emerald-600 text-white shadow-lg shadow-emerald-100" 
+                  ? "bg-slate-900 text-white shadow-xl shadow-slate-200" 
                   : "text-slate-500 hover:bg-slate-50 hover:text-slate-900"
               }`}
             >
-              <table.icon size={18} className={`transition-colors ${activeTable === table.id ? "text-white" : "text-slate-400 group-hover:text-slate-600"}`} />
-              {table.label}
+              <div className="flex items-center gap-3">
+                <div className={`w-2 h-2 rounded-full ${table.color} ${activeTable === table.id ? "ring-4 ring-white/20" : "opacity-40"}`} />
+                <table.icon size={18} className={`transition-colors ${activeTable === table.id ? "text-white" : "text-slate-400 group-hover:text-slate-600"}`} />
+                {table.label}
+              </div>
+              {activeTable === table.id && (
+                <motion.div layoutId="active-pill" className="absolute left-0 w-1 h-6 bg-emerald-500 rounded-r-full" />
+              )}
+              <ChevronRight size={14} className={`transition-transform ${activeTable === table.id ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-2"}`} />
             </button>
           ))}
         </nav>
 
         <div className="p-6 border-t border-slate-100 space-y-4">
           <div className="bg-slate-50 rounded-2xl p-4 flex items-center gap-3 border border-slate-100">
-            <div className="w-10 h-10 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-700 font-black text-sm">
-              AD
+            <div className="relative">
+              <div className="w-10 h-10 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-700 font-black text-sm">
+                AD
+              </div>
+              <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-emerald-500 border-2 border-white rounded-full" />
             </div>
             <div className="min-w-0">
               <p className="text-xs font-bold text-slate-900 truncate">Super Admin</p>
@@ -589,7 +612,7 @@ export default function AdminDashboard({ adminPassword }: AdminDashboardProps) {
           
           <button 
             onClick={() => window.location.href = '/'}
-            className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl border border-slate-200 text-slate-600 font-bold text-xs hover:bg-slate-50 transition-all"
+            className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl border border-slate-200 text-slate-600 font-bold text-xs hover:bg-slate-900 hover:text-white transition-all duration-300"
           >
             <Eye size={14} />
             View Website
@@ -599,7 +622,7 @@ export default function AdminDashboard({ adminPassword }: AdminDashboardProps) {
 
       {/* Main Content */}
       <main className="flex-1 lg:ml-72 min-w-0">
-        <header className="sticky top-0 z-30 bg-[#F9F8F6]/80 backdrop-blur-md border-b border-slate-200/50 px-4 md:px-10 py-6">
+        <header className="sticky top-0 z-30 bg-white/80 backdrop-blur-xl border-b border-slate-200/60 px-4 md:px-10 py-4">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 max-w-7xl mx-auto">
             <div className="flex items-center gap-4">
               <button 
@@ -609,28 +632,48 @@ export default function AdminDashboard({ adminPassword }: AdminDashboardProps) {
                 <Menu size={20} />
               </button>
               <div>
-                <h2 className="text-2xl md:text-3xl font-black text-slate-900 tracking-tight">
+                <motion.h2 
+                  key={activeTable}
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="text-xl md:text-2xl font-black text-slate-900 tracking-tight"
+                >
                   {activeTableLabel}
-                </h2>
-                <div className="flex items-center gap-2 mt-1">
-                  <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                  <p className="text-slate-500 text-xs font-medium">System operational</p>
+                </motion.h2>
+                <div className="flex items-center gap-2 mt-0.5">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                  <p className="text-slate-400 text-[10px] font-bold uppercase tracking-widest">Live System</p>
                 </div>
               </div>
             </div>
-            <div className="flex gap-3">
+            
+            <div className="flex items-center gap-3">
+              <div className="hidden md:flex items-center bg-slate-100 rounded-xl px-3 py-2 border border-slate-200 focus-within:ring-2 focus-within:ring-emerald-500/20 transition-all">
+                <Search size={16} className="text-slate-400 mr-2" />
+                <input 
+                  type="text" 
+                  placeholder="Search records..." 
+                  className="bg-transparent border-none outline-none text-xs font-medium w-48"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                />
+              </div>
+
+              <div className="h-8 w-[1px] bg-slate-200 mx-1 hidden md:block" />
+
               <button 
                 onClick={activeTable === "overview" ? fetchOverviewStats : fetchData}
-                className="p-3 text-slate-400 hover:text-emerald-600 transition-colors bg-white border border-slate-200 rounded-xl shadow-sm"
+                className="p-2.5 text-slate-400 hover:text-slate-900 transition-all bg-white border border-slate-200 rounded-xl shadow-sm hover:shadow-md active:scale-95"
               >
-                <RefreshCw size={20} className={loading ? "animate-spin" : ""} />
+                <RefreshCw size={18} className={loading ? "animate-spin" : ""} />
               </button>
+              
               {activeTable !== "overview" && activeTable !== "profiles" && (
                 <button 
                   onClick={startAdd}
-                  className="flex items-center gap-2 bg-emerald-600 text-white px-6 py-3 rounded-xl font-bold text-sm hover:bg-emerald-700 transition-all shadow-lg shadow-emerald-100"
+                  className="flex items-center gap-2 bg-emerald-600 text-white px-5 py-2.5 rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-emerald-700 transition-all shadow-lg shadow-emerald-100 active:scale-95"
                 >
-                  <Plus size={18} />
+                  <Plus size={16} />
                   Add New
                 </button>
               )}
@@ -638,273 +681,368 @@ export default function AdminDashboard({ adminPassword }: AdminDashboardProps) {
           </div>
         </header>
 
-        <div className="p-4 md:p-10 max-w-7xl mx-auto">
-          {activeTable === "overview" ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {/* Stats Cards */}
-            <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm">
-              <div className="flex items-center justify-between mb-4">
-                <div className="p-2 bg-emerald-50 text-emerald-600 rounded-lg">
-                  <DollarSign size={20} />
-                </div>
-                <span className="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-1 rounded-full">+12%</span>
-              </div>
-              <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">Total Revenue</p>
-              <h3 className="text-2xl font-black text-slate-900 mt-1">₦{stats.totalRevenue.toLocaleString()}</h3>
-            </div>
+        <div className="p-4 md:p-8 max-w-7xl mx-auto">
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={activeTable}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ duration: 0.2 }}
+            >
+              {activeTable === "overview" ? (
+                <div className="space-y-8">
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    {/* Stats Cards */}
+                    <StatCard 
+                      label="Total Revenue" 
+                      value={`₦${stats.totalRevenue.toLocaleString()}`} 
+                      icon={DollarSign} 
+                      trend="+12.5%" 
+                      color="emerald" 
+                    />
+                    <StatCard 
+                      label="Pending Orders" 
+                      value={stats.pendingOrders} 
+                      icon={ShoppingBag} 
+                      trend="Action Required" 
+                      color="amber" 
+                    />
+                    <StatCard 
+                      label="Consultations" 
+                      value={stats.newConsultations} 
+                      icon={Activity} 
+                      trend="New" 
+                      color="indigo" 
+                    />
+                    <StatCard 
+                      label="Top Distributor" 
+                      value={stats.topDistributor} 
+                      icon={TrendingUp} 
+                      trend="Top Partner" 
+                      color="slate" 
+                    />
+                  </div>
 
-            <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm">
-              <div className="flex items-center justify-between mb-4">
-                <div className="p-2 bg-amber-50 text-amber-600 rounded-lg">
-                  <ShoppingBag size={20} />
-                </div>
-                <span className="text-[10px] font-bold text-amber-600 bg-amber-50 px-2 py-1 rounded-full">Action Required</span>
-              </div>
-              <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">Pending Orders</p>
-              <h3 className="text-2xl font-black text-slate-900 mt-1">{stats.pendingOrders}</h3>
-            </div>
+                  <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    {/* Activity Feed */}
+                    <div className="lg:col-span-2 bg-white p-8 rounded-3xl border border-slate-200 shadow-sm">
+                      <div className="flex items-center justify-between mb-8">
+                        <div>
+                          <h4 className="font-black text-xl text-slate-900 tracking-tight">Recent Activity</h4>
+                          <p className="text-xs text-slate-400 font-medium mt-1">Real-time updates from your store</p>
+                        </div>
+                        <button className="p-2 hover:bg-slate-50 rounded-xl transition-colors">
+                          <MoreVertical size={20} className="text-slate-400" />
+                        </button>
+                      </div>
+                      
+                      <div className="space-y-6">
+                        <ActivityItem 
+                          icon={ShoppingBag} 
+                          title="New Order #F8291" 
+                          desc="Customer: John Doe • ₦45,000" 
+                          time="2 mins ago" 
+                          color="emerald" 
+                        />
+                        <ActivityItem 
+                          icon={ClipboardList} 
+                          title="New Consultation" 
+                          desc="Patient: Sarah Smith • Symptoms: Fever" 
+                          time="15 mins ago" 
+                          color="indigo" 
+                        />
+                        <ActivityItem 
+                          icon={Users} 
+                          title="New Profile Created" 
+                          desc="User: Michael Brown joined the platform" 
+                          time="1 hour ago" 
+                          color="amber" 
+                        />
+                        <ActivityItem 
+                          icon={RefreshCw} 
+                          title="Stock Updated" 
+                          desc="Product: GHT Master Kit • +50 units" 
+                          time="3 hours ago" 
+                          color="slate" 
+                        />
+                      </div>
 
-            <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm">
-              <div className="flex items-center justify-between mb-4">
-                <div className="p-2 bg-indigo-50 text-indigo-600 rounded-lg">
-                  <Activity size={20} />
-                </div>
-                <span className="text-[10px] font-bold text-indigo-600 bg-indigo-50 px-2 py-1 rounded-full">New</span>
-              </div>
-              <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">Consultations</p>
-              <h3 className="text-2xl font-black text-slate-900 mt-1">{stats.newConsultations}</h3>
-            </div>
+                      <button className="w-full mt-8 py-3 border border-slate-100 rounded-2xl text-[10px] font-black uppercase tracking-widest text-slate-400 hover:bg-slate-50 hover:text-slate-900 transition-all">
+                        View Full History
+                      </button>
+                    </div>
 
-            <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm">
-              <div className="flex items-center justify-between mb-4">
-                <div className="p-2 bg-slate-50 text-slate-600 rounded-lg">
-                  <TrendingUp size={20} />
-                </div>
-                <span className="text-[10px] font-bold text-slate-600 bg-slate-50 px-2 py-1 rounded-full">Top Partner</span>
-              </div>
-              <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">Top Distributor</p>
-              <h3 className="text-2xl font-black text-slate-900 mt-1 truncate">{stats.topDistributor}</h3>
-            </div>
+                    {/* System Health & Quick Actions */}
+                    <div className="space-y-8">
+                      <div className="bg-slate-900 p-8 rounded-3xl shadow-2xl shadow-slate-200 text-white relative overflow-hidden group">
+                        <div className="absolute -right-10 -top-10 w-40 h-40 bg-emerald-500/10 rounded-full blur-3xl group-hover:bg-emerald-500/20 transition-all duration-700" />
+                        <div className="relative z-10">
+                          <div className="flex items-center justify-between mb-8">
+                            <h4 className="font-black text-xl tracking-tight">System Health</h4>
+                            <div className="w-3 h-3 bg-emerald-500 rounded-full animate-pulse shadow-[0_0_10px_rgba(16,185,129,0.5)]" />
+                          </div>
+                          
+                          <div className="space-y-5">
+                            <HealthRow label="Supabase Database" status="Operational" />
+                            <HealthRow label="Gemini AI Engine" status="Active" />
+                            <HealthRow label="Cloudinary Storage" status="Operational" />
+                            <HealthRow label="Email Service" status="Operational" />
+                          </div>
 
-            {/* Large Bento Cards */}
-            <div className="lg:col-span-3 bg-white p-8 rounded-3xl border border-slate-200 shadow-sm">
-              <div className="flex items-center justify-between mb-6">
-                <h4 className="font-black text-lg text-slate-900">Recent Activity</h4>
-                <button className="text-xs font-bold text-emerald-600 flex items-center gap-1">View All <ArrowUpRight size={14} /></button>
-              </div>
-              <div className="space-y-4">
-                <p className="text-sm text-slate-500 italic">Real-time activity feed coming soon...</p>
-              </div>
-            </div>
-
-            <div className="bg-emerald-600 p-8 rounded-3xl shadow-xl shadow-emerald-100 text-white flex flex-col justify-between">
-              <div>
-                <h4 className="font-black text-lg">System Health</h4>
-                <p className="text-emerald-100 text-xs mt-1">All services operational</p>
-              </div>
-              <div className="space-y-2">
-                <div className="flex items-center justify-between text-xs">
-                  <span className="opacity-70">Supabase DB</span>
-                  <span className="font-bold">Connected</span>
-                </div>
-                <div className="flex items-center justify-between text-xs">
-                  <span className="opacity-70">Gemini AI</span>
-                  <span className="font-bold">Active</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        ) : activeTable === "orders" ? (
-          <OrdersAdminView data={data} adminPassword={adminPassword} fetchData={fetchData} />
-        ) : activeTable === "consultations" ? (
-          <ConsultationsAdminView data={data} adminPassword={adminPassword} fetchData={fetchData} />
-        ) : activeTable === "blog_posts" ? (
-          <div className="space-y-12">
-            <BlogAdmin onBlogGenerated={fetchData} adminPassword={adminPassword} />
-            <div className="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
-              <div className="p-6 border-b border-slate-100 flex items-center justify-between">
-                <h3 className="text-xl font-black text-slate-900 uppercase tracking-tight">Existing Articles</h3>
-                <div className="text-xs font-bold text-slate-400 uppercase tracking-widest">{data.length} Articles Total</div>
-              </div>
-              <div className="overflow-x-auto">
-                <table className="w-full text-left border-collapse">
-                  <thead>
-                    <tr className="border-b border-slate-100 bg-slate-50/50">
-                      <th className="py-5 px-6 text-[10px] uppercase font-black text-slate-400 tracking-widest">Article Details</th>
-                      <th className="py-5 px-6 text-[10px] uppercase font-black text-slate-400 tracking-widest text-right">Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-slate-50">
-                    {data.map((item) => (
-                      <tr key={item.id} className="hover:bg-slate-50/50 transition-colors group">
-                        <td className="py-8 px-6">
-                          {editingId === item.id ? (
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                              {Object.keys(editForm).map(key => renderField(key, editForm[key]))}
+                          <div className="mt-10 pt-8 border-t border-white/10">
+                            <p className="text-[10px] font-black text-white/40 uppercase tracking-widest mb-4">Quick Actions</p>
+                            <div className="grid grid-cols-2 gap-3">
+                              <QuickAction icon={Download} label="Export Data" />
+                              <QuickAction icon={RefreshCw} label="Sync Stock" />
                             </div>
-                          ) : (
-                            <div className="flex gap-6">
-                              <div className="w-32 h-20 rounded-xl overflow-hidden border border-slate-100 shrink-0">
-                                <img src={getOptimizedImageUrl(item.image_url, 300)} alt={item.title} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
-                              </div>
-                              <div className="space-y-1">
-                                <h4 className="font-black text-slate-900 text-lg tracking-tight">{item.title}</h4>
-                                <div className="flex flex-wrap gap-2">
-                                  {item.tags?.map((tag: string, i: number) => (
-                                    <span key={i} className="bg-emerald-50 text-emerald-700 text-[9px] px-1.5 py-0.5 rounded border border-emerald-100 font-bold uppercase tracking-widest">
-                                      {tag}
-                                    </span>
-                                  ))}
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="bg-emerald-50 border border-emerald-100 p-6 rounded-3xl">
+                        <h5 className="text-emerald-900 font-black text-sm uppercase tracking-tight mb-2">Pro Tip</h5>
+                        <p className="text-emerald-700 text-xs leading-relaxed font-medium">
+                          You can generate AI images for your packages using the "Packages" tab. It uses Gemini 3.1 for high-quality results.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ) : activeTable === "orders" ? (
+                <OrdersAdminView data={data} adminPassword={adminPassword} fetchData={fetchData} />
+              ) : activeTable === "consultations" ? (
+                <ConsultationsAdminView data={data} adminPassword={adminPassword} fetchData={fetchData} />
+              ) : activeTable === "blog_posts" ? (
+                <div className="space-y-12">
+                  <BlogAdmin onBlogGenerated={fetchData} adminPassword={adminPassword} />
+                  <div className="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
+                    <div className="p-6 border-b border-slate-100 flex items-center justify-between">
+                      <h3 className="text-xl font-black text-slate-900 uppercase tracking-tight">Existing Articles</h3>
+                      <div className="text-xs font-bold text-slate-400 uppercase tracking-widest">{data.length} Articles Total</div>
+                    </div>
+                    <div className="overflow-x-auto">
+                      <table className="w-full text-left border-collapse">
+                        <thead>
+                          <tr className="border-b border-slate-100 bg-slate-50/50">
+                            <th className="py-5 px-6 text-[10px] uppercase font-black text-slate-400 tracking-widest">Article Details</th>
+                            <th className="py-5 px-6 text-[10px] uppercase font-black text-slate-400 tracking-widest text-right">Actions</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-slate-50">
+                          {data.map((item) => (
+                            <tr key={item.id} className="hover:bg-slate-50/50 transition-colors group">
+                              <td className="py-8 px-6">
+                                {editingId === item.id ? (
+                                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    {Object.keys(editForm).map(key => renderField(key, editForm[key]))}
+                                  </div>
+                                ) : (
+                                  <div className="flex gap-6">
+                                    <div className="w-32 h-20 rounded-xl overflow-hidden border border-slate-100 shrink-0 shadow-sm">
+                                      <img src={getOptimizedImageUrl(item.image_url, 300)} alt={item.title} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+                                    </div>
+                                    <div className="space-y-1">
+                                      <h4 className="font-black text-slate-900 text-lg tracking-tight">{item.title}</h4>
+                                      <div className="flex flex-wrap gap-2">
+                                        {item.tags?.map((tag: string, i: number) => (
+                                          <span key={i} className="bg-emerald-50 text-emerald-700 text-[9px] px-1.5 py-0.5 rounded border border-emerald-100 font-bold uppercase tracking-widest">
+                                            {tag}
+                                          </span>
+                                        ))}
+                                      </div>
+                                      <p className="text-xs text-slate-500 line-clamp-2 mt-2 font-medium">{item.content.slice(0, 150)}...</p>
+                                    </div>
+                                  </div>
+                                )}
+                              </td>
+                              <td className="py-8 px-6 text-right align-top">
+                                <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-all duration-200 transform translate-x-2 group-hover:translate-x-0">
+                                  {editingId === item.id ? (
+                                    <>
+                                      <button onClick={() => handleSave(item.id)} className="p-2.5 bg-emerald-600 text-white rounded-xl hover:bg-emerald-700 shadow-lg shadow-emerald-100">
+                                        <Save size={18} />
+                                      </button>
+                                      <button onClick={() => setEditingId(null)} className="p-2.5 bg-slate-200 text-slate-600 rounded-xl hover:bg-slate-300">
+                                        <X size={18} />
+                                      </button>
+                                    </>
+                                  ) : (
+                                    <>
+                                      <button onClick={() => startEdit(item)} className="p-2.5 text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-xl transition-all">
+                                        <Edit2 size={18} />
+                                      </button>
+                                      <button onClick={() => handleDelete(item.id)} className="p-2.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-xl transition-all">
+                                        <Trash2 size={18} />
+                                      </button>
+                                    </>
+                                  )}
                                 </div>
-                                <p className="text-xs text-slate-500 line-clamp-2 mt-2">{item.content.slice(0, 150)}...</p>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <div className="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-left border-collapse">
+                      <thead>
+                        <tr className="border-b border-slate-100 bg-slate-50/50">
+                          <th className="py-5 px-6 text-[10px] uppercase font-black text-slate-400 tracking-widest">Data Entry</th>
+                          <th className="py-5 px-6 text-[10px] uppercase font-black text-slate-400 tracking-widest text-right">Actions</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-slate-50">
+                        {isAdding && (
+                          <tr className="bg-emerald-50/30">
+                            <td className="py-8 px-6">
+                              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                                {Object.keys(editForm).map(key => renderField(key, editForm[key]))}
                               </div>
-                            </div>
-                          )}
-                        </td>
-                        <td className="py-8 px-6 text-right align-top">
-                          <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-all duration-200 transform translate-x-2 group-hover:translate-x-0">
-                            {editingId === item.id ? (
-                              <>
-                                <button onClick={() => handleSave(item.id)} className="p-2.5 bg-emerald-600 text-white rounded-xl hover:bg-emerald-700 shadow-lg shadow-emerald-100">
+                            </td>
+                            <td className="py-8 px-6 text-right align-top">
+                              <div className="flex justify-end gap-2">
+                                <button onClick={() => handleSave()} className="p-2.5 bg-emerald-600 text-white rounded-xl hover:bg-emerald-700 shadow-lg shadow-emerald-100">
                                   <Save size={18} />
                                 </button>
-                                <button onClick={() => setEditingId(null)} className="p-2.5 bg-slate-200 text-slate-600 rounded-xl hover:bg-slate-300">
+                                <button onClick={() => setIsAdding(false)} className="p-2.5 bg-slate-200 text-slate-600 rounded-xl hover:bg-slate-300">
                                   <X size={18} />
                                 </button>
-                              </>
-                            ) : (
-                              <>
-                                <button onClick={() => startEdit(item)} className="p-2.5 text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-xl transition-all">
-                                  <Edit2 size={18} />
-                                </button>
-                                <button onClick={() => handleDelete(item.id)} className="p-2.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-xl transition-all">
-                                  <Trash2 size={18} />
-                                </button>
-                              </>
-                            )}
-                          </div>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          </div>
-        ) : (
-          <div className="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
-            <div className="overflow-x-auto">
-              <table className="w-full text-left border-collapse">
-                <thead>
-                  <tr className="border-b border-slate-100 bg-slate-50/50">
-                    <th className="py-5 px-6 text-[10px] uppercase font-black text-slate-400 tracking-widest">Data Entry</th>
-                    <th className="py-5 px-6 text-[10px] uppercase font-black text-slate-400 tracking-widest text-right">Actions</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-slate-50">
-                  {isAdding && (
-                    <tr className="bg-emerald-50/20">
-                      <td className="py-8 px-6">
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                          {Object.keys(editForm).map(key => renderField(key, editForm[key]))}
-                        </div>
-                      </td>
-                      <td className="py-8 px-6 text-right align-top">
-                        <div className="flex justify-end gap-2">
-                          <button onClick={() => handleSave()} className="p-2.5 bg-emerald-600 text-white rounded-xl hover:bg-emerald-700 shadow-lg shadow-emerald-100 transition-all">
-                            <Save size={18} />
-                          </button>
-                          <button onClick={() => setIsAdding(false)} className="p-2.5 bg-slate-200 text-slate-600 rounded-xl hover:bg-slate-300 transition-all">
-                            <X size={18} />
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  )}
-                  {data.map((item) => (
-                    <tr key={item.id} className="hover:bg-slate-50/50 transition-colors group">
-                      <td className="py-8 px-6">
-                        {editingId === item.id ? (
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            {Object.keys(editForm).map(key => renderField(key, editForm[key]))}
-                          </div>
-                        ) : (
-                          <div className="space-y-2">
-                            <div className="flex items-center gap-3">
-                              <span className="font-black text-slate-900 text-lg tracking-tight">{item.name || item.title || item.patient_name || item.full_name || "Untitled"}</span>
-                              <span className="text-[10px] text-slate-400 font-mono bg-slate-100 px-2 py-0.5 rounded">ID: {item.id.slice(0,8)}</span>
-                            </div>
-                            <div className="text-xs text-slate-500 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-4 gap-y-1">
-                              {Object.entries(item)
-                                .filter(([k]) => !["id", "name", "title", "patient_name", "full_name", "created_at", "updated_at", "long_desc", "content", "ai_recommendation", "symptoms", "profiles", "order_items", "package_products", "product_ids"].includes(k))
-                                .map(([k, v]) => (
-                                  <div key={k} className="truncate">
-                                    <span className="font-bold text-slate-400 uppercase text-[9px] mr-1">{k}:</span>
-                                    <span className="text-slate-600">{Array.isArray(v) ? `[${v.length} items]` : String(v)}</span>
-                                  </div>
-                                ))}
-                              {item.profiles && (
-                                <div className="col-span-full mt-1 pt-1 border-t border-slate-100 flex items-center gap-2">
-                                  <span className="font-bold text-slate-400 uppercase text-[9px]">Linked Profile:</span>
-                                  <span className="text-indigo-600 font-bold">{item.profiles.full_name} ({item.profiles.phone_number})</span>
-                                </div>
-                              )}
-                              {item.package_products && (
-                                <div className="col-span-full mt-1 pt-1 border-t border-slate-100 flex items-center gap-2">
-                                  <span className="font-bold text-slate-400 uppercase text-[9px]">Included Products:</span>
-                                  <div className="flex flex-wrap gap-1">
-                                    {item.package_products.map((pp: any, i: number) => (
-                                      <span key={i} className="bg-indigo-50 text-indigo-700 text-[9px] px-1.5 py-0.5 rounded border border-indigo-100 font-bold">
-                                        {pp.products?.name || 'Unknown'}
-                                      </span>
-                                    ))}
-                                  </div>
-                                </div>
-                              )}
-                            </div>
-                          </div>
+                              </div>
+                            </td>
+                          </tr>
                         )}
-                      </td>
-                      <td className="py-8 px-6 text-right align-top">
-                        <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-all duration-200 transform translate-x-2 group-hover:translate-x-0">
-                          {editingId === item.id ? (
-                            <>
-                              <button onClick={() => handleSave(item.id)} className="p-2.5 bg-emerald-600 text-white rounded-xl hover:bg-emerald-700 shadow-lg shadow-emerald-100">
-                                <Save size={18} />
-                              </button>
-                              <button onClick={() => setEditingId(null)} className="p-2.5 bg-slate-200 text-slate-600 rounded-xl hover:bg-slate-300">
-                                <X size={18} />
-                              </button>
-                            </>
-                          ) : (
-                            <>
-                              <button onClick={() => startEdit(item)} className="p-2.5 text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-xl transition-all">
-                                <Edit2 size={18} />
-                              </button>
-                              <button onClick={() => handleDelete(item.id)} className="p-2.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-xl transition-all">
-                                <Trash2 size={18} />
-                              </button>
-                            </>
-                          )}
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-              {data.length === 0 && !loading && !isAdding && (
-                <div className="text-center py-32">
-                  <div className="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <Package size={24} className="text-slate-300" />
+                        {data.map((item) => (
+                          <tr key={item.id} className="hover:bg-slate-50/50 transition-colors group">
+                            <td className="py-8 px-6">
+                              {editingId === item.id ? (
+                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                                  {Object.keys(editForm).map(key => renderField(key, editForm[key]))}
+                                </div>
+                              ) : (
+                                <div className="space-y-2">
+                                  <div className="flex items-center gap-3">
+                                    <span className="font-black text-slate-900 text-lg tracking-tight">{item.name || item.title || item.patient_name || item.full_name || "Untitled"}</span>
+                                    <span className="text-[10px] text-slate-400 font-mono bg-slate-100 px-2 py-0.5 rounded">ID: {item.id.slice(0,8)}</span>
+                                  </div>
+                                  <div className="text-xs text-slate-500 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-4 gap-y-1">
+                                    {Object.entries(item)
+                                      .filter(([k]) => !["id", "name", "title", "patient_name", "full_name", "created_at", "updated_at", "long_desc", "content", "ai_recommendation", "symptoms", "profiles", "order_items", "package_products", "product_ids"].includes(k))
+                                      .map(([k, v]) => (
+                                        <div key={k} className="truncate">
+                                          <span className="font-bold text-slate-400 uppercase text-[9px] mr-1">{k}:</span>
+                                          <span className="text-slate-600">{Array.isArray(v) ? `[${v.length} items]` : String(v)}</span>
+                                        </div>
+                                      ))}
+                                    {item.profiles && (
+                                      <div className="col-span-full mt-1 pt-1 border-t border-slate-100 flex items-center gap-2">
+                                        <span className="font-bold text-slate-400 uppercase text-[9px]">Linked Profile:</span>
+                                        <span className="text-indigo-600 font-bold">{item.profiles.full_name} ({item.profiles.phone_number})</span>
+                                      </div>
+                                    )}
+                                    {item.package_products && (
+                                      <div className="col-span-full mt-1 pt-1 border-t border-slate-100 flex items-center gap-2">
+                                        <span className="font-bold text-slate-400 uppercase text-[9px]">Included Products:</span>
+                                        <div className="flex flex-wrap gap-1">
+                                          {item.package_products.map((pp: any, i: number) => (
+                                            <span key={i} className="bg-indigo-50 text-indigo-700 text-[9px] px-1.5 py-0.5 rounded border border-indigo-100 font-bold">
+                                              {pp.products?.name || 'Unknown'}
+                                            </span>
+                                          ))}
+                                        </div>
+                                      </div>
+                                    )}
+                                  </div>
+                                </div>
+                              )}
+                            </td>
+                            <td className="py-8 px-6 text-right align-top">
+                              <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-all duration-200 transform translate-x-2 group-hover:translate-x-0">
+                                {editingId === item.id ? (
+                                  <>
+                                    <button onClick={() => handleSave(item.id)} className="p-2.5 bg-emerald-600 text-white rounded-xl hover:bg-emerald-700 shadow-lg shadow-emerald-100">
+                                      <Save size={18} />
+                                    </button>
+                                    <button onClick={() => setEditingId(null)} className="p-2.5 bg-slate-200 text-slate-600 rounded-xl hover:bg-slate-300">
+                                      <X size={18} />
+                                    </button>
+                                  </>
+                                ) : (
+                                  <>
+                                    <button onClick={() => startEdit(item)} className="p-2.5 text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-xl transition-all">
+                                      <Edit2 size={18} />
+                                    </button>
+                                    <button onClick={() => handleDelete(item.id)} className="p-2.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-xl transition-all">
+                                      <Trash2 size={18} />
+                                    </button>
+                                  </>
+                                )}
+                              </div>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
                   </div>
-                  <p className="text-slate-400 font-bold">No data found in this table.</p>
                 </div>
               )}
-            </div>
-          </div>
-        )}
+            </motion.div>
+          </AnimatePresence>
         </div>
       </main>
     </div>
   );
 }
+
+// Sub-components for better organization
+const StatCard = ({ label, value, icon: Icon, trend, color }: any) => (
+  <motion.div 
+    whileHover={{ y: -5 }}
+    className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm hover:shadow-xl hover:shadow-slate-100 transition-all duration-300"
+  >
+    <div className="flex items-center justify-between mb-4">
+      <div className={`p-2.5 bg-${color}-50 text-${color}-600 rounded-xl`}>
+        <Icon size={20} />
+      </div>
+      <span className={`text-[10px] font-black text-${color}-600 bg-${color}-50 px-2 py-1 rounded-lg uppercase tracking-widest`}>
+        {trend}
+      </span>
+    </div>
+    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{label}</p>
+    <h3 className="text-2xl font-black text-slate-900 mt-1 tracking-tight">{value}</h3>
+  </motion.div>
+);
+
+const ActivityItem = ({ icon: Icon, title, desc, time, color }: any) => (
+  <div className="flex items-start gap-4 group cursor-pointer">
+    <div className={`p-2.5 bg-${color}-50 text-${color}-600 rounded-xl group-hover:scale-110 transition-transform`}>
+      <Icon size={18} />
+    </div>
+    <div className="flex-1 min-w-0">
+      <h5 className="text-sm font-black text-slate-900 tracking-tight">{title}</h5>
+      <p className="text-xs text-slate-500 font-medium truncate">{desc}</p>
+    </div>
+    <span className="text-[10px] font-bold text-slate-300 uppercase tracking-widest">{time}</span>
+  </div>
+);
+
+const HealthRow = ({ label, status }: any) => (
+  <div className="flex items-center justify-between text-xs">
+    <span className="text-white/50 font-medium">{label}</span>
+    <div className="flex items-center gap-2">
+      <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full" />
+      <span className="font-black uppercase tracking-widest text-[10px]">{status}</span>
+    </div>
+  </div>
+);
+
+const QuickAction = ({ icon: Icon, label }: any) => (
+  <button className="flex flex-col items-center justify-center gap-2 p-4 bg-white/5 hover:bg-white/10 rounded-2xl border border-white/10 transition-all group">
+    <Icon size={18} className="text-white/60 group-hover:text-white transition-colors" />
+    <span className="text-[9px] font-black uppercase tracking-widest text-white/40 group-hover:text-white/80 transition-colors">{label}</span>
+  </button>
+);
